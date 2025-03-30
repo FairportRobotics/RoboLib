@@ -1,4 +1,4 @@
-package com.fairportrobotics.frc.poe.controllers.lighting;
+package org.fairportrobotics.frc.robolib.controllers.lighting;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

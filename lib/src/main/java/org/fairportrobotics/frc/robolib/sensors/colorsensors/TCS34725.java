@@ -1,4 +1,4 @@
-package com.fairportrobotics.frc.poe.sensors.colorsensors;
+package org.fairportrobotics.frc.robolib.sensors.colorsensors;
 
 import edu.wpi.first.wpilibj.I2C;
 
