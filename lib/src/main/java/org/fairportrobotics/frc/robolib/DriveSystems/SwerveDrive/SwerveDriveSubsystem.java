@@ -1,14 +1,21 @@
 package org.fairportrobotics.frc.robolib.DriveSystems.SwerveDrive;
 
+import java.util.Arrays;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveDriveSubsystem extends SubsystemBase{
@@ -17,6 +24,8 @@ public class SwerveDriveSubsystem extends SubsystemBase{
     private ChassisSpeeds chassisSpeeds;
     private Translation2d centerOfRotation;
 
+    private SwerveDrivePoseEstimator3d poseEstimator;
+
     private SwerveModule[] modules;
 
     private final double MAX_LINEAR_SPEED = 3.9;
@@ -24,15 +33,17 @@ public class SwerveDriveSubsystem extends SubsystemBase{
 
     private Pigeon2 gyro;
 
-    public SwerveDriveSubsystem(){
+    public SwerveDriveSubsystem(int pigeonId, SwerveModule... modules){
+
+        this.modules = modules; 
 
         driveKiniematics = new SwerveDriveKinematics(
-            modules[0].getModuleLocation(),
-            modules[1].getModuleLocation(),
-            modules[2].getModuleLocation(),
-            modules[3].getModuleLocation()
+            Arrays.stream(modules).map((m) -> m.getModuleLocation()).toArray(size -> new Translation2d[size])
         );
 
+        gyro = new Pigeon2(pigeonId);
+
+        poseEstimator = new SwerveDrivePoseEstimator3d(driveKiniematics, new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions(), Pose3d.kZero);
     }
 
     @Override
@@ -41,19 +52,28 @@ public class SwerveDriveSubsystem extends SubsystemBase{
         Logger.recordOutput("Un-Optimized Swerve States", moduleStates);
 
         for(int i=0; i<modules.length;i++){
-            moduleStates[i].optimize(Rotation2d.fromRotations(modules[i].getCurrentSteerRotations()));
+            moduleStates[i].optimize(modules[i].getCurrentSteerRotations());
         }
+
+        poseEstimator.update(new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
 
         Logger.recordOutput("Optimized Swerve States", moduleStates);
 
         for(int i=0;i<modules.length;i++){
-            modules[i].setSteerRotations(moduleStates[i].angle.getRotations());
-            modules[i].setDriveSpeed(moduleStates[i].speedMetersPerSecond);
+            modules[i].setModuleState(moduleStates[i]);
         }
     }
 
+    public Translation2d[] getModuleLocations(){
+        return Arrays.stream(modules).map((SwerveModule m) -> m.getModuleLocation()).toArray(Translation2d[]::new);
+    }
+
+    public Angle getCurrentYaw(){
+        return gyro.getYaw().refresh().getValue();
+    }
+
     public void setChassisSpeed(ChassisSpeeds chassisSpeeds){
-        this.chassisSpeeds = chassisSpeeds;
+        this.setChassisSpeed(chassisSpeeds, Translation2d.kZero);
     }
 
     public void setChassisSpeed(ChassisSpeeds chassisSpeeds, Translation2d centerOfRotation){
@@ -61,8 +81,17 @@ public class SwerveDriveSubsystem extends SubsystemBase{
         this.centerOfRotation = centerOfRotation;
     }
 
-    public void chassisSpeedsFromJoystick(double x, double y, double rot){
-        ChassisSpeeds.fromFieldRelativeSpeeds(MAX_LINEAR_SPEED * x, MAX_LINEAR_SPEED * y, MAX_ANGULAR_SPEED * rot, Rotation2d.fromDegrees(gyro.getYaw().refresh().getValueAsDouble()));
+    public void setChassisSpeedsFromJoystick(double x, double y, double rot){
+        this.setChassisSpeed(ChassisSpeeds.fromFieldRelativeSpeeds(
+            MAX_LINEAR_SPEED * x,
+            MAX_LINEAR_SPEED * y,
+            MAX_ANGULAR_SPEED * rot,
+            Rotation2d.fromDegrees(getCurrentYaw().magnitude())
+        ));
+    }
+
+    private SwerveModulePosition[] getModulePositions(){
+        return Arrays.stream(modules).map((SwerveModule m) -> m.getModulePosition()).toArray(SwerveModulePosition[]::new);
     }
 
 }

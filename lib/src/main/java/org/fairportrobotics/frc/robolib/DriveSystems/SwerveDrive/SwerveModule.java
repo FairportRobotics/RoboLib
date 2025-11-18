@@ -1,6 +1,7 @@
 package org.fairportrobotics.frc.robolib.DriveSystems.SwerveDrive;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -9,7 +10,9 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.sun.jdi.request.StepRequest;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class SwerveModule {
@@ -42,6 +45,7 @@ public class SwerveModule {
         double steerKI,
         double steerKD,
         int steerEncoderId,
+        double steerOffset,
         String canBusName,
         Translation2d moduleLocation,
         double gearRatio,
@@ -59,7 +63,7 @@ public class SwerveModule {
         steerEncoder = new CANcoder(steerEncoderId, canBusName);
         steerEncoder.getPosition().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
         steerEncoder.optimizeBusUtilization();
-        steerEncoder.getConfigurator().apply(generateCanCoderConfiguration());
+        steerEncoder.getConfigurator().apply(generateCanCoderConfiguration(steerOffset));
 
         this.moduleLocation = moduleLocation;
 
@@ -71,8 +75,8 @@ public class SwerveModule {
         steerMotor.setControl(steerRequest.withSlot(0).withPosition(rotations));
     }
 
-    public double getCurrentSteerRotations(){
-        return steerEncoder.getPosition().refresh().getValueAsDouble();
+    public Rotation2d getCurrentSteerRotations(){
+        return new Rotation2d(steerEncoder.getPosition().refresh().getValueAsDouble());
     }
 
     public void setDriveSpeed(double speed){
@@ -88,16 +92,30 @@ public class SwerveModule {
         return moduleLocation;
     }
 
+    public void setModuleState(SwerveModuleState state){
+        this.setSteerRotations(state.angle.getRotations());
+        this.setDriveSpeed(state.speedMetersPerSecond);
+    }
+
     public SwerveModuleState getModuleState(){
         return moduleState;
+    }
+
+    public SwerveModulePosition getModulePosition(){
+        return new SwerveModulePosition(this.getModuleDistance(), getCurrentSteerRotations());
+    }
+
+    private double getModuleDistance(){
+        double distance = (this.driveMotor.getPosition(true).getValueAsDouble() / TALON_BUILT_IN_ENCODER_UNITS_PER_ROTATION) / gearRatio / (Math.PI * wheelDiameterInMeters);
+        return distance;
     }
 
     private TalonFXConfiguration generateTalonConfiguration(double kP, double kI, double kD){
         return new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(kP).withKI(kI).withKD(kD));
     }
 
-    private CANcoderConfiguration generateCanCoderConfiguration(){
-        return new CANcoderConfiguration();
+    private CANcoderConfiguration generateCanCoderConfiguration(double steerOffset){
+        return new CANcoderConfiguration().withMagnetSensor(new MagnetSensorConfigs().withMagnetOffset(steerOffset));
     }
 
 }
