@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class SwerveBuilder {
 
     ArrayList<SwerveModule> modules = new ArrayList<SwerveModule>();
-    String canBusName = "";
+    String canBusName = "rio";
 
     private int pigeonId;
 
@@ -49,6 +49,7 @@ public class SwerveBuilder {
         private Translation2d moduleLocation;
         private double gearRatio;
         private double wheelDiameterInMeters;
+        private String moduleName;
 
         public SwerveModuleBuilder() {
 
@@ -114,9 +115,14 @@ public class SwerveBuilder {
             return this;
         }
 
+        public SwerveModuleBuilder withModuleName(String moduleName){
+            this.moduleName = moduleName;
+            return this;
+        }
+
         public SwerveModule build() {
             return new SwerveModule(driveMotorId, driveKP, driveKI, driveKD, steerMotorId, steerKP, steerKI, steerKD,
-                    steerEncoderId, steerOffset, canBusName, moduleLocation, gearRatio, wheelDiameterInMeters);
+                    steerEncoderId, steerOffset, canBusName, moduleLocation, gearRatio, wheelDiameterInMeters, moduleName);
         }
 
     }

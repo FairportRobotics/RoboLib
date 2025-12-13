@@ -33,6 +33,8 @@ public class SwerveModule {
     private PositionVoltage steerRequest = new PositionVoltage(0);
     private CANcoder steerEncoder;
 
+    private String moduleName;
+
     private Translation2d moduleLocation;
 
     public SwerveModule(
@@ -49,7 +51,8 @@ public class SwerveModule {
         String canBusName,
         Translation2d moduleLocation,
         double gearRatio,
-        double wheelDiameterInMeters
+        double wheelDiameterInMeters,
+        String moduleName
     ){
         driveMotor = new TalonFX(driveMotorId, canBusName);
         driveMotor.getVelocity().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
@@ -69,6 +72,8 @@ public class SwerveModule {
 
         this.gearRatio = gearRatio;
         this.wheelDiameterInMeters = wheelDiameterInMeters;
+
+        this.moduleName = moduleName;
     }
 
     public void setSteerRotations(double rotations){
@@ -80,7 +85,7 @@ public class SwerveModule {
     }
 
     public void setDriveSpeed(double speed){
-        double rotorVelocity = ((Math.PI * wheelDiameterInMeters) / speed) * gearRatio * TALON_BUILT_IN_ENCODER_UNITS_PER_ROTATION;
+        double rotorVelocity = ((Math.PI * wheelDiameterInMeters) / speed) * gearRatio;
         driveMotor.setControl(driveRequest.withSlot(0).withVelocity(rotorVelocity));
     }
 
@@ -106,7 +111,7 @@ public class SwerveModule {
     }
 
     private double getModuleDistance(){
-        double distance = (this.driveMotor.getPosition(true).getValueAsDouble() / TALON_BUILT_IN_ENCODER_UNITS_PER_ROTATION) / gearRatio / (Math.PI * wheelDiameterInMeters);
+        double distance = (this.driveMotor.getPosition(true).getValueAsDouble()) / gearRatio / (Math.PI * wheelDiameterInMeters);
         return distance;
     }
 

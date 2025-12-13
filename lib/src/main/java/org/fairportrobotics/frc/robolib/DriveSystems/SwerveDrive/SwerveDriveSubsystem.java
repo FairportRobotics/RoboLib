@@ -2,8 +2,6 @@ package org.fairportrobotics.frc.robolib.DriveSystems.SwerveDrive;
 
 import java.util.Arrays;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
@@ -44,20 +42,18 @@ public class SwerveDriveSubsystem extends SubsystemBase{
         gyro = new Pigeon2(pigeonId);
 
         poseEstimator = new SwerveDrivePoseEstimator3d(driveKiniematics, new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions(), Pose3d.kZero);
+        chassisSpeeds = new ChassisSpeeds();
     }
 
     @Override
     public void periodic() {
         SwerveModuleState[] moduleStates = driveKiniematics.toSwerveModuleStates(chassisSpeeds, centerOfRotation);
-        Logger.recordOutput("Un-Optimized Swerve States", moduleStates);
 
         for(int i=0; i<modules.length;i++){
             moduleStates[i].optimize(modules[i].getCurrentSteerRotations());
         }
 
         poseEstimator.update(new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
-
-        Logger.recordOutput("Optimized Swerve States", moduleStates);
 
         for(int i=0;i<modules.length;i++){
             modules[i].setModuleState(moduleStates[i]);
