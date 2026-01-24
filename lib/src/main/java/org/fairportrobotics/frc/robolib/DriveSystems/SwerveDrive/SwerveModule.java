@@ -86,7 +86,7 @@ public class SwerveModule {
 
     public void setDriveSpeed(double speed){
         double rotorVelocity = ((Math.PI * wheelDiameterInMeters) / speed) * gearRatio;
-        driveMotor.setControl(driveRequest.withSlot(0).withVelocity(rotorVelocity));
+        //driveMotor.setControl(driveRequest.withSlot(0).withVelocity(rotorVelocity));
     }
 
     public double getDriveSpeed(){
@@ -100,6 +100,7 @@ public class SwerveModule {
     public void setModuleState(SwerveModuleState state){
         this.setSteerRotations(state.angle.getRotations());
         this.setDriveSpeed(state.speedMetersPerSecond);
+        moduleState = state;
     }
 
     public SwerveModuleState getModuleState(){

@@ -64,6 +64,10 @@ public class SwerveDriveSubsystem extends SubsystemBase{
         return Arrays.stream(modules).map((SwerveModule m) -> m.getModuleLocation()).toArray(Translation2d[]::new);
     }
 
+    public SwerveModuleState[] getModuleStates(){
+        return Arrays.stream(modules).map((SwerveModule m) -> m.getModuleState()).toArray(SwerveModuleState[]::new);
+    }
+
     public Angle getCurrentYaw(){
         return gyro.getYaw().refresh().getValue();
     }
