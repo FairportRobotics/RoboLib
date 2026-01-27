@@ -9,6 +9,9 @@ public class SwerveBuilder {
     ArrayList<SwerveModule> modules = new ArrayList<SwerveModule>();
     String canBusName = "rio";
 
+    private double maxAngularVelRadiansSecond = 1.0;
+    private double maxLinearVelMetersSecond = Math.PI;
+
     private int pigeonId;
 
     public SwerveBuilder(){
@@ -30,8 +33,28 @@ public class SwerveBuilder {
         return this;
     }
 
+    /**
+     * Set the max linear velocity in meters per second
+     * @param maxVel Max linear velocity in meters per second
+     * @return The swerve builder
+     */
+    public SwerveBuilder withMaxLinearVelocity(double maxVel){
+        this.maxLinearVelMetersSecond = maxVel;
+        return this;
+    }
+
+    /**
+     * Set the max angular velocity in radians per second
+     * @param maxVel Max angular velocity in radians per second
+     * @return The swerve builder
+     */
+    public SwerveBuilder withMaxAngularVelocity(double maxVel){
+        this.maxAngularVelRadiansSecond = maxVel;
+        return this;
+    }
+
     public SwerveDriveSubsystem build(){
-        return new SwerveDriveSubsystem(pigeonId, modules.toArray(size -> new SwerveModule[size]));
+        return new SwerveDriveSubsystem(pigeonId, maxLinearVelMetersSecond, maxAngularVelRadiansSecond, modules.toArray(size -> new SwerveModule[size]));
     }
 
     public class SwerveModuleBuilder {

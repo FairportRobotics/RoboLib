@@ -2,6 +2,7 @@ package org.fairportrobotics.frc.robolib.DriveSystems.SwerveDrive;
 
 import java.util.Arrays;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
@@ -26,12 +27,17 @@ public class SwerveDriveSubsystem extends SubsystemBase{
 
     private SwerveModule[] modules;
 
-    private final double MAX_LINEAR_SPEED = 3.9;
-    private final double MAX_ANGULAR_SPEED = Math.PI * 2;
+    private double MAX_LINEAR_SPEED = 3.9;
+    private double MAX_ANGULAR_SPEED = Math.PI * 2;
 
     private Pigeon2 gyro;
 
-    public SwerveDriveSubsystem(int pigeonId, SwerveModule... modules){
+    private double mLastSimTime = 0;
+
+    public SwerveDriveSubsystem(int pigeonId, double maxLinearVelMetersSecond, double maxAngularVelRadiansSecond, SwerveModule... modules){
+
+        MAX_LINEAR_SPEED = maxLinearVelMetersSecond;
+        MAX_ANGULAR_SPEED = maxAngularVelRadiansSecond;
 
         this.modules = modules; 
 
@@ -47,17 +53,32 @@ public class SwerveDriveSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
+        super.periodic();
         SwerveModuleState[] moduleStates = driveKiniematics.toSwerveModuleStates(chassisSpeeds, centerOfRotation);
 
         for(int i=0; i<modules.length;i++){
-            moduleStates[i].optimize(modules[i].getCurrentSteerRotations());
+            moduleStates[i].optimize(modules[i].getSteerRotations());
         }
 
-        poseEstimator.update(new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
+        poseEstimator.updateWithTime(Utils.getCurrentTimeSeconds(), new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
 
         for(int i=0;i<modules.length;i++){
             modules[i].setModuleState(moduleStates[i]);
         }
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        super.simulationPeriodic();
+
+        double deltaTimeSecond = (mLastSimTime - Utils.getCurrentTimeSeconds());
+
+        if(mLastSimTime != 0){
+            Pose3d oldPose = getRobotPose();
+            poseEstimator.resetPose(new Pose3d(oldPose.getX() + (chassisSpeeds.vxMetersPerSecond * (deltaTimeSecond)), oldPose.getY() + chassisSpeeds.vyMetersPerSecond * (deltaTimeSecond), 0, oldPose.getRotation().plus(new Rotation3d(Rotation2d.fromRadians(chassisSpeeds.omegaRadiansPerSecond * (deltaTimeSecond))))));
+        }
+
+        mLastSimTime = Utils.getCurrentTimeSeconds();
     }
 
     public Translation2d[] getModuleLocations(){
@@ -66,6 +87,14 @@ public class SwerveDriveSubsystem extends SubsystemBase{
 
     public SwerveModuleState[] getModuleStates(){
         return Arrays.stream(modules).map((SwerveModule m) -> m.getModuleState()).toArray(SwerveModuleState[]::new);
+    }
+
+    public SwerveModule[] getModules(){
+        return Arrays.stream(modules).toArray(SwerveModule[]::new);
+    }
+
+    public int getNumberOfModules(){
+        return modules.length;
     }
 
     public Angle getCurrentYaw(){
@@ -81,13 +110,38 @@ public class SwerveDriveSubsystem extends SubsystemBase{
         this.centerOfRotation = centerOfRotation;
     }
 
-    public void setChassisSpeedsFromJoystick(double x, double y, double rot){
+    /**
+     * Set robot speed relative to field
+     * @param x Forward robot speed in meters per second
+     * @param y Left robot speed in meters per second
+     * @param rot CCW robot speed in radians per second
+     */
+    public void setChassisSpeedsFromJoystickFieldRelative(double x, double y, double rot){
         this.setChassisSpeed(ChassisSpeeds.fromFieldRelativeSpeeds(
             MAX_LINEAR_SPEED * x,
             MAX_LINEAR_SPEED * y,
             MAX_ANGULAR_SPEED * rot,
             Rotation2d.fromDegrees(getCurrentYaw().magnitude())
         ));
+    }
+
+    /**
+     * Set robot speed relative to robot
+     * @param x Forward robot speed in meters per second
+     * @param y Left robot speed in meters per second
+     * @param rot CCW robot speed in radians per second
+     */
+    public void setChassisSpeedsFromJoystickRobotRelative(double x, double y, double rot){
+        this.setChassisSpeed(ChassisSpeeds.fromRobotRelativeSpeeds(
+            MAX_LINEAR_SPEED * x,
+            MAX_LINEAR_SPEED * y,
+            MAX_ANGULAR_SPEED * rot,
+            Rotation2d.fromDegrees(getCurrentYaw().magnitude())
+        ));
+    }
+
+    public Pose3d getRobotPose(){
+        return poseEstimator.getEstimatedPosition();
     }
 
     private SwerveModulePosition[] getModulePositions(){
