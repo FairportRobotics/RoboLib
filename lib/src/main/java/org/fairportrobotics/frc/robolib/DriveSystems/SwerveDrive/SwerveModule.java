@@ -4,8 +4,10 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -18,7 +20,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.Angle;
 
 public class SwerveModule {
 
@@ -35,7 +36,7 @@ public class SwerveModule {
     private TalonFX driveMotor;
     private VelocityVoltage driveRequest = new VelocityVoltage(0);
     private TalonFX steerMotor;
-    private PositionVoltage steerRequest = new PositionVoltage(0);
+    private MotionMagicVoltage steerRequest = new MotionMagicVoltage(0);
     private CANcoder steerEncoder;
 
     private String moduleName;
@@ -52,7 +53,9 @@ public class SwerveModule {
         double steerKP,
         double steerKI,
         double steerKD,
+        double steerKS,
         double steerKV,
+        double steerKA,
         int steerEncoderId,
         double steerOffset,
         String canBusName,
@@ -74,7 +77,7 @@ public class SwerveModule {
 
         steerMotor = new TalonFX(steerMotorId, canBusName);
         steerMotor.optimizeBusUtilization();
-        steerMotor.getConfigurator().apply(generateSteerTalonConfiguration(steerKP, steerKI, steerKD, steerKV));
+        steerMotor.getConfigurator().apply(generateSteerTalonConfiguration(steerKP, steerKI, steerKD, steerKS, steerKV, steerKA));
 
         this.moduleLocation = moduleLocation;
 
@@ -84,17 +87,19 @@ public class SwerveModule {
         this.moduleName = moduleName;
     }
 
-    public void setSteerRotations(Angle rotations){
-        steerMotor.setControl(steerRequest.withSlot(0).withPosition(rotations));
+    public void setSteerRotations(Rotation2d rotations){
+        steerMotor.setControl(steerRequest.withSlot(0).withPosition(rotations.getMeasure()));
     }
 
     public Rotation2d getSteerRotations(){
-        return new Rotation2d(steerEncoder.getPosition().refresh().getValueAsDouble());
+        // Maybe go back to non-Absolute Pos
+        // Or try reading from the steer motot for the pos
+        return new Rotation2d(steerEncoder.getAbsolutePosition().getValue());
     }
 
     public void setDriveSpeed(double speed){
         // Convert wheel speed to rotor speed
-        // Circumfrence of wheel / speed * gear ratio
+        // (speed / Circumfrence of wheel) * gear ratio
         double rotorVelocity = (speed / (Math.PI * wheelDiameterInMeters)) * gearRatio;
         driveMotor.setControl(driveRequest.withSlot(0).withVelocity(rotorVelocity));
     }
@@ -120,7 +125,7 @@ public class SwerveModule {
     }
 
     public void setModuleState(SwerveModuleState state){
-        this.setSteerRotations(state.angle.getMeasure());
+        this.setSteerRotations(state.angle);
         this.setDriveSpeed(state.speedMetersPerSecond);
         moduleState = state;
     }
@@ -152,14 +157,21 @@ public class SwerveModule {
             );
     }
 
-    private TalonFXConfiguration generateSteerTalonConfiguration(double kP, double kI, double kD, double kV){
+    private TalonFXConfiguration generateSteerTalonConfiguration(double kP, double kI, double kD, double kS, double kV, double kA){
         return new TalonFXConfiguration().withSlot0(
             new Slot0Configs()
                 .withKP(kP)
                 .withKI(kI)
                 .withKD(kD)
-                .withKS(kV)
+                .withKS(kS)
+                .withKV(kV)
+                .withKA(kA)
                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
+        ).withMotionMagic(
+            new MotionMagicConfigs()
+                .withMotionMagicCruiseVelocity(80)
+                .withMotionMagicAcceleration(160)
+                .withMotionMagicJerk(1600)
         ).withFeedback(
             new FeedbackConfigs()
                 .withFeedbackRemoteSensorID(steerEncoder.getDeviceID())

@@ -14,47 +14,50 @@ public class SwerveBuilder {
 
     private int pigeonId;
 
-    public SwerveBuilder(){
+    public SwerveBuilder() {
 
     }
 
-    public SwerveBuilder withPigeonId(int pigeonId){
+    public SwerveBuilder withPigeonId(int pigeonId) {
         this.pigeonId = pigeonId;
         return this;
     }
 
-    public SwerveBuilder withCanbusName(String canBusname){
+    public SwerveBuilder withCanbusName(String canBusname) {
         this.canBusName = canBusname;
         return this;
     }
 
-    public SwerveBuilder withSwerveModule(SwerveModule module){
+    public SwerveBuilder withSwerveModule(SwerveModule module) {
         this.modules.add(module);
         return this;
     }
 
     /**
      * Set the max linear velocity in meters per second
+     * 
      * @param maxVel Max linear velocity in meters per second
      * @return The swerve builder
      */
-    public SwerveBuilder withMaxLinearVelocity(double maxVel){
+    public SwerveBuilder withMaxLinearVelocity(double maxVel) {
         this.maxLinearVelMetersSecond = maxVel;
         return this;
     }
 
     /**
      * Set the max angular velocity in radians per second
+     * 
      * @param maxVel Max angular velocity in radians per second
      * @return The swerve builder
      */
-    public SwerveBuilder withMaxAngularVelocity(double maxVel){
+    public SwerveBuilder withMaxAngularVelocity(double maxVel) {
         this.maxAngularVelRadiansSecond = maxVel;
         return this;
     }
 
-    public SwerveDriveSubsystem build(){
-        return new SwerveDriveSubsystem(pigeonId, canBusName, maxLinearVelMetersSecond, maxAngularVelRadiansSecond, modules.toArray(size -> new SwerveModule[size]));
+    public SwerveDriveSubsystem build() {
+        return new SwerveDriveSubsystem(pigeonId, canBusName, maxLinearVelMetersSecond, maxAngularVelRadiansSecond,
+                modules.toArray(size -> new SwerveModule[size]));
     }
 
     public class SwerveModuleBuilder {
@@ -68,7 +71,9 @@ public class SwerveBuilder {
         private double steerKP;
         private double steerKI;
         private double steerKD;
+        private double steerKS;
         private double steerKV;
+        private double steerKA;
         private int steerEncoderId;
         private double steerOffset;
         private Translation2d moduleLocation;
@@ -80,84 +85,96 @@ public class SwerveBuilder {
 
         }
 
-        public SwerveModuleBuilder withDriveMotorId(int driveMotorId){
+        public SwerveModuleBuilder withDriveMotorId(int driveMotorId) {
             this.driveMotorId = driveMotorId;
             return this;
         }
 
-        public SwerveModuleBuilder withDriveKP(double driveKP){
+        public SwerveModuleBuilder withDriveKP(double driveKP) {
             this.driveKP = driveKP;
             return this;
         }
 
-        public SwerveModuleBuilder withDriveKI(double driveKI){
+        public SwerveModuleBuilder withDriveKI(double driveKI) {
             this.driveKI = driveKI;
             return this;
         }
 
-        public SwerveModuleBuilder withDriveKD(double driveKD){
+        public SwerveModuleBuilder withDriveKD(double driveKD) {
             this.driveKD = driveKD;
             return this;
         }
 
-        public SwerveModuleBuilder withDriveKV(double driveKV){
+        public SwerveModuleBuilder withDriveKV(double driveKV) {
             this.driveKV = driveKV;
             return this;
         }
 
-        public SwerveModuleBuilder withSteerMotorId(int steerMotorId){
+        public SwerveModuleBuilder withSteerMotorId(int steerMotorId) {
             this.steerMotorId = steerMotorId;
             return this;
         }
 
-        public SwerveModuleBuilder withSteerKP(double steerKP){
+        public SwerveModuleBuilder withSteerKP(double steerKP) {
             this.steerKP = steerKP;
             return this;
         }
 
-        public SwerveModuleBuilder withSteerKI(double steerKI){
+        public SwerveModuleBuilder withSteerKI(double steerKI) {
             this.steerKI = steerKI;
             return this;
         }
 
-        public SwerveModuleBuilder withSteerKD(double steerKD){
+        public SwerveModuleBuilder withSteerKD(double steerKD) {
             this.steerKD = steerKD;
             return this;
         }
 
-        public SwerveModuleBuilder withSteerKV(double steerKV){
+        public SwerveModuleBuilder withSteerKS(double steerKS) {
+            this.steerKS = steerKS;
+            return this;
+        }
+
+        public SwerveModuleBuilder withSteerKV(double steerKV) {
             this.steerKV = steerKV;
             return this;
         }
 
-        public SwerveModuleBuilder withSteerEncoderId(int steerEncoderId){
+        public SwerveModuleBuilder withSteerKA(double steerKA) {
+            this.steerKA = steerKA;
+            return this;
+        }
+
+        public SwerveModuleBuilder withSteerEncoderId(int steerEncoderId) {
             this.steerEncoderId = steerEncoderId;
             return this;
         }
 
-        public SwerveModuleBuilder withModuleLocation(Translation2d moduleLocation){
+        public SwerveModuleBuilder withModuleLocation(Translation2d moduleLocation) {
             this.moduleLocation = moduleLocation;
             return this;
         }
 
-        public SwerveModuleBuilder withGearRatio(double gearRatio){
+        public SwerveModuleBuilder withGearRatio(double gearRatio) {
             this.gearRatio = gearRatio;
             return this;
         }
 
-        public SwerveModuleBuilder withWheelDiameter(double wheelDiameterInMeters){
+        public SwerveModuleBuilder withWheelDiameter(double wheelDiameterInMeters) {
             this.wheelDiameterInMeters = wheelDiameterInMeters;
             return this;
         }
 
-        public SwerveModuleBuilder withModuleName(String moduleName){
+        public SwerveModuleBuilder withModuleName(String moduleName) {
             this.moduleName = moduleName;
             return this;
         }
 
         public SwerveModule build() {
-            return new SwerveModule(driveMotorId, driveKP, driveKI, driveKD, driveKV, steerMotorId, steerKP, steerKI, steerKD, steerKV,
-                    steerEncoderId, steerOffset, canBusName, moduleLocation, gearRatio, wheelDiameterInMeters, moduleName);
+            return new SwerveModule(driveMotorId, driveKP, driveKI, driveKD, driveKV, steerMotorId, steerKP, steerKI,
+                    steerKD, steerKS, steerKV, steerKA,
+                    steerEncoderId, steerOffset, canBusName, moduleLocation, gearRatio, wheelDiameterInMeters,
+                    moduleName);
         }
 
     }
