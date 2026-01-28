@@ -54,7 +54,7 @@ public class SwerveBuilder {
     }
 
     public SwerveDriveSubsystem build(){
-        return new SwerveDriveSubsystem(pigeonId, maxLinearVelMetersSecond, maxAngularVelRadiansSecond, modules.toArray(size -> new SwerveModule[size]));
+        return new SwerveDriveSubsystem(pigeonId, canBusName, maxLinearVelMetersSecond, maxAngularVelRadiansSecond, modules.toArray(size -> new SwerveModule[size]));
     }
 
     public class SwerveModuleBuilder {
@@ -63,10 +63,12 @@ public class SwerveBuilder {
         private double driveKP;
         private double driveKI;
         private double driveKD;
+        private double driveKV;
         private int steerMotorId;
         private double steerKP;
         private double steerKI;
         private double steerKD;
+        private double steerKV;
         private int steerEncoderId;
         private double steerOffset;
         private Translation2d moduleLocation;
@@ -98,6 +100,11 @@ public class SwerveBuilder {
             return this;
         }
 
+        public SwerveModuleBuilder withDriveKV(double driveKV){
+            this.driveKV = driveKV;
+            return this;
+        }
+
         public SwerveModuleBuilder withSteerMotorId(int steerMotorId){
             this.steerMotorId = steerMotorId;
             return this;
@@ -115,6 +122,11 @@ public class SwerveBuilder {
 
         public SwerveModuleBuilder withSteerKD(double steerKD){
             this.steerKD = steerKD;
+            return this;
+        }
+
+        public SwerveModuleBuilder withSteerKV(double steerKV){
+            this.steerKV = steerKV;
             return this;
         }
 
@@ -144,7 +156,7 @@ public class SwerveBuilder {
         }
 
         public SwerveModule build() {
-            return new SwerveModule(driveMotorId, driveKP, driveKI, driveKD, steerMotorId, steerKP, steerKI, steerKD,
+            return new SwerveModule(driveMotorId, driveKP, driveKI, driveKD, driveKV, steerMotorId, steerKP, steerKI, steerKD, steerKV,
                     steerEncoderId, steerOffset, canBusName, moduleLocation, gearRatio, wheelDiameterInMeters, moduleName);
         }
 

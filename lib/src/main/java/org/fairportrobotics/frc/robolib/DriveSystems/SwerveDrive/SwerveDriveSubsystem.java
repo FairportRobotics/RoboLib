@@ -34,7 +34,7 @@ public class SwerveDriveSubsystem extends SubsystemBase{
 
     private double mLastSimTime = 0;
 
-    public SwerveDriveSubsystem(int pigeonId, double maxLinearVelMetersSecond, double maxAngularVelRadiansSecond, SwerveModule... modules){
+    public SwerveDriveSubsystem(int pigeonId, String canBusName, double maxLinearVelMetersSecond, double maxAngularVelRadiansSecond, SwerveModule... modules){
 
         MAX_LINEAR_SPEED = maxLinearVelMetersSecond;
         MAX_ANGULAR_SPEED = maxAngularVelRadiansSecond;
@@ -45,7 +45,7 @@ public class SwerveDriveSubsystem extends SubsystemBase{
             Arrays.stream(modules).map((m) -> m.getModuleLocation()).toArray(size -> new Translation2d[size])
         );
 
-        gyro = new Pigeon2(pigeonId);
+        gyro = new Pigeon2(pigeonId, canBusName);
 
         poseEstimator = new SwerveDrivePoseEstimator3d(driveKiniematics, new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions(), Pose3d.kZero);
         chassisSpeeds = new ChassisSpeeds();
@@ -56,9 +56,9 @@ public class SwerveDriveSubsystem extends SubsystemBase{
         super.periodic();
         SwerveModuleState[] moduleStates = driveKiniematics.toSwerveModuleStates(chassisSpeeds, centerOfRotation);
 
-        for(int i=0; i<modules.length;i++){
-            moduleStates[i].optimize(modules[i].getSteerRotations());
-        }
+        // for(int i=0; i<modules.length;i++){
+        //     moduleStates[i].optimize(modules[i].getSteerRotations());
+        // }
 
         poseEstimator.updateWithTime(Utils.getCurrentTimeSeconds(), new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
 

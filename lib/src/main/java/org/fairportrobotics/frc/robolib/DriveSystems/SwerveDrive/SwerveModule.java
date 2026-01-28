@@ -11,12 +11,14 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.sun.jdi.request.StepRequest;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
 
 public class SwerveModule {
 
@@ -45,10 +47,12 @@ public class SwerveModule {
         double driveKP,
         double driveKI,
         double driveKD,
+        double driveKV,
         int steerMotorId,
         double steerKP,
         double steerKI,
         double steerKD,
+        double steerKV,
         int steerEncoderId,
         double steerOffset,
         String canBusName,
@@ -57,19 +61,20 @@ public class SwerveModule {
         double wheelDiameterInMeters,
         String moduleName
     ){
-        driveMotor = new TalonFX(driveMotorId, canBusName);
-        driveMotor.getVelocity().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
-        driveMotor.optimizeBusUtilization();
-        driveMotor.getConfigurator().apply(generateDriveTalonConfiguration(driveKP, driveKI, driveKD));
-
-        steerMotor = new TalonFX(steerMotorId, canBusName);
-        steerMotor.optimizeBusUtilization();
-        steerMotor.getConfigurator().apply(generateSteerTalonConfiguration(steerKP, steerKI, steerKD));
 
         steerEncoder = new CANcoder(steerEncoderId, canBusName);
         steerEncoder.getPosition().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
         steerEncoder.optimizeBusUtilization();
         steerEncoder.getConfigurator().apply(generateCanCoderConfiguration(steerOffset));
+
+        driveMotor = new TalonFX(driveMotorId, canBusName);
+        driveMotor.getVelocity().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
+        driveMotor.optimizeBusUtilization();
+        driveMotor.getConfigurator().apply(generateDriveTalonConfiguration(driveKP, driveKI, driveKD, driveKV));
+
+        steerMotor = new TalonFX(steerMotorId, canBusName);
+        steerMotor.optimizeBusUtilization();
+        steerMotor.getConfigurator().apply(generateSteerTalonConfiguration(steerKP, steerKI, steerKD, steerKV));
 
         this.moduleLocation = moduleLocation;
 
@@ -79,7 +84,7 @@ public class SwerveModule {
         this.moduleName = moduleName;
     }
 
-    public void setSteerRotations(double rotations){
+    public void setSteerRotations(Angle rotations){
         steerMotor.setControl(steerRequest.withSlot(0).withPosition(rotations));
     }
 
@@ -90,7 +95,7 @@ public class SwerveModule {
     public void setDriveSpeed(double speed){
         // Convert wheel speed to rotor speed
         // Circumfrence of wheel / speed * gear ratio
-        double rotorVelocity = ((Math.PI * wheelDiameterInMeters) / speed) * gearRatio;
+        double rotorVelocity = (speed / (Math.PI * wheelDiameterInMeters)) * gearRatio;
         driveMotor.setControl(driveRequest.withSlot(0).withVelocity(rotorVelocity));
     }
 
@@ -107,7 +112,7 @@ public class SwerveModule {
      * @return
      */
     public double getDriveWheelSpeed(){
-        return (driveMotor.getVelocity().refresh().getValueAsDouble() / gearRatio) * (Math.PI * wheelDiameterInMeters);
+        return (driveMotor.getVelocity().refresh().getValueAsDouble() * gearRatio) / (Math.PI * wheelDiameterInMeters);
     }
 
     public Translation2d getModuleLocation(){
@@ -115,7 +120,7 @@ public class SwerveModule {
     }
 
     public void setModuleState(SwerveModuleState state){
-        this.setSteerRotations(state.angle.getRotations());
+        this.setSteerRotations(state.angle.getMeasure());
         this.setDriveSpeed(state.speedMetersPerSecond);
         moduleState = state;
     }
@@ -133,34 +138,46 @@ public class SwerveModule {
     }
 
     private double getModuleDistance(){
-        double distance = (this.driveMotor.getPosition(true).getValueAsDouble()) / gearRatio * (Math.PI * wheelDiameterInMeters);
+        double distance = (this.driveMotor.getPosition(true).getValueAsDouble() * gearRatio) / (Math.PI * wheelDiameterInMeters);
         return distance;
     }
 
-    private TalonFXConfiguration generateDriveTalonConfiguration(double kP, double kI, double kD){
+    private TalonFXConfiguration generateDriveTalonConfiguration(double kP, double kI, double kD, double kV){
         return new TalonFXConfiguration().withSlot0(
             new Slot0Configs()
                 .withKP(kP)
                 .withKI(kI)
                 .withKD(kD)
+                .withKV(kV)
             );
     }
 
-    private TalonFXConfiguration generateSteerTalonConfiguration(double kP, double kI, double kD){
+    private TalonFXConfiguration generateSteerTalonConfiguration(double kP, double kI, double kD, double kV){
         return new TalonFXConfiguration().withSlot0(
             new Slot0Configs()
                 .withKP(kP)
                 .withKI(kI)
                 .withKD(kD)
+                .withKS(kV)
+                .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
         ).withFeedback(
             new FeedbackConfigs()
                 .withFeedbackRemoteSensorID(steerEncoder.getDeviceID())
-                .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
+                .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
+                .withSensorToMechanismRatio(1.0)
+                .withRotorToSensorRatio(12.8)
+        ).withClosedLoopGeneral(
+            new ClosedLoopGeneralConfigs()
+            .withContinuousWrap(true)
         );
     }
 
     private CANcoderConfiguration generateCanCoderConfiguration(double steerOffset){
-        return new CANcoderConfiguration().withMagnetSensor(new MagnetSensorConfigs().withMagnetOffset(steerOffset));
+        return new CANcoderConfiguration().withMagnetSensor(
+            new MagnetSensorConfigs()
+                .withMagnetOffset(steerOffset)
+                .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+            );
     }
 
 }
