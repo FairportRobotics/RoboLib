@@ -2,6 +2,7 @@ package org.fairportrobotics.frc.robolib.drivesystems.swerve;
 
 import java.lang.reflect.Modifier;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -63,24 +64,24 @@ public class SwerveModule {
         double steerKA,
         int steerEncoderId,
         double steerOffset,
-        String canBusName,
+        CANBus canBusObj,
         Translation2d moduleLocation,
         double gearRatio,
         double wheelDiameterInMeters,
         String moduleName
     ){
 
-        steerEncoder = new CANcoder(steerEncoderId, canBusName);
+        steerEncoder = new CANcoder(steerEncoderId, canBusObj);
         // steerEncoder.getAbsolutePosition().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
         // steerEncoder.optimizeBusUtilization();
         steerEncoder.getConfigurator().apply(generateCanCoderConfiguration(steerOffset));
 
-        driveMotor = new TalonFX(driveMotorId, canBusName);
+        driveMotor = new TalonFX(driveMotorId, canBusObj);
         // driveMotor.getVelocity().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
         // driveMotor.optimizeBusUtilization();
         driveMotor.getConfigurator().apply(generateDriveTalonConfiguration(driveKP, driveKI, driveKD, driveKV, driveInverted));
 
-        steerMotor = new TalonFX(steerMotorId, canBusName);
+        steerMotor = new TalonFX(steerMotorId, canBusObj);
         // steerMotor.optimizeBusUtilization();
         steerMotor.getConfigurator().apply(generateSteerTalonConfiguration(steerKP, steerKI, steerKD, steerKS, steerKV, steerKA));
         // steerMotor.setNeutralMode(NeutralModeValue.Brake);

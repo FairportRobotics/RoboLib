@@ -2,12 +2,14 @@ package org.fairportrobotics.frc.robolib.drivesystems.swerve;
 
 import java.util.ArrayList;
 
+import com.ctre.phoenix6.CANBus;
+
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class SwerveBuilder {
 
     ArrayList<SwerveModule> modules = new ArrayList<SwerveModule>();
-    String canBusName = "rio";
+    CANBus canBusObj;
 
     private double maxAngularVelRadiansSecond = 1.0;
     private double maxLinearVelMetersSecond = Math.PI;
@@ -24,7 +26,7 @@ public class SwerveBuilder {
     }
 
     public SwerveBuilder withCanbusName(String canBusname) {
-        this.canBusName = canBusname;
+        this.canBusObj = new CANBus(canBusname);
         return this;
     }
 
@@ -56,7 +58,7 @@ public class SwerveBuilder {
     }
 
     public SwerveDriveSubsystem build() {
-        return new SwerveDriveSubsystem(pigeonId, canBusName, maxLinearVelMetersSecond, maxAngularVelRadiansSecond,
+        return new SwerveDriveSubsystem(pigeonId, canBusObj, maxLinearVelMetersSecond, maxAngularVelRadiansSecond,
                 modules.toArray(size -> new SwerveModule[size]));
     }
 
@@ -184,7 +186,7 @@ public class SwerveBuilder {
         public SwerveModule build() {
             return new SwerveModule(driveMotorId, driveKP, driveKI, driveKD, driveKV, driveInverted, steerMotorId, steerKP, steerKI,
                     steerKD, steerKS, steerKV, steerKA,
-                    steerEncoderId, steerOffset, canBusName, moduleLocation, gearRatio, wheelDiameterInMeters,
+                    steerEncoderId, steerOffset, canBusObj, moduleLocation, gearRatio, wheelDiameterInMeters,
                     moduleName);
         }
 

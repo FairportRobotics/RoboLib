@@ -2,6 +2,7 @@ package org.fairportrobotics.frc.robolib.drivesystems.swerve;
 
 import java.util.Arrays;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
@@ -34,7 +35,7 @@ public class SwerveDriveSubsystem extends SubsystemBase{
 
     private double mLastSimTime = 0;
 
-    public SwerveDriveSubsystem(int pigeonId, String canBusName, double maxLinearVelMetersSecond, double maxAngularVelRadiansSecond, SwerveModule... modules){
+    public SwerveDriveSubsystem(int pigeonId, CANBus canBus, double maxLinearVelMetersSecond, double maxAngularVelRadiansSecond, SwerveModule... modules){
 
         MAX_LINEAR_SPEED = maxLinearVelMetersSecond;
         MAX_ANGULAR_SPEED = maxAngularVelRadiansSecond;
@@ -45,7 +46,7 @@ public class SwerveDriveSubsystem extends SubsystemBase{
             Arrays.stream(modules).map((m) -> m.getModuleLocation()).toArray(size -> new Translation2d[size])
         );
 
-        gyro = new Pigeon2(pigeonId, canBusName);
+        gyro = new Pigeon2(pigeonId, canBus);
 
         poseEstimator = new SwerveDrivePoseEstimator3d(driveKiniematics, new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions(), Pose3d.kZero);
         chassisSpeeds = new ChassisSpeeds();
