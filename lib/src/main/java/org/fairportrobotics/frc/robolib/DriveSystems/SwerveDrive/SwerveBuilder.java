@@ -67,6 +67,7 @@ public class SwerveBuilder {
         private double driveKI;
         private double driveKD;
         private double driveKV;
+        private boolean driveInverted = false;
         private int steerMotorId;
         private double steerKP;
         private double steerKI;
@@ -110,6 +111,11 @@ public class SwerveBuilder {
             return this;
         }
 
+        public SwerveModuleBuilder withDriveInverted(){
+            this.driveInverted = true;
+            return this;
+        }
+
         public SwerveModuleBuilder withSteerMotorId(int steerMotorId) {
             this.steerMotorId = steerMotorId;
             return this;
@@ -150,6 +156,11 @@ public class SwerveBuilder {
             return this;
         }
 
+        public SwerveModuleBuilder withSteerOffset(double offsetRotations) {
+            this.steerOffset = offsetRotations;
+            return this;
+        }
+
         public SwerveModuleBuilder withModuleLocation(Translation2d moduleLocation) {
             this.moduleLocation = moduleLocation;
             return this;
@@ -171,7 +182,7 @@ public class SwerveBuilder {
         }
 
         public SwerveModule build() {
-            return new SwerveModule(driveMotorId, driveKP, driveKI, driveKD, driveKV, steerMotorId, steerKP, steerKI,
+            return new SwerveModule(driveMotorId, driveKP, driveKI, driveKD, driveKV, driveInverted, steerMotorId, steerKP, steerKI,
                     steerKD, steerKS, steerKV, steerKA,
                     steerEncoderId, steerOffset, canBusName, moduleLocation, gearRatio, wheelDiameterInMeters,
                     moduleName);

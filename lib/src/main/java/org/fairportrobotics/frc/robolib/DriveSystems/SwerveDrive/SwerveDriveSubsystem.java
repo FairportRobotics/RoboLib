@@ -54,16 +54,17 @@ public class SwerveDriveSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         super.periodic();
-        SwerveModuleState[] moduleStates = driveKiniematics.toSwerveModuleStates(chassisSpeeds, centerOfRotation);
+        SwerveModuleState[] moduleStates = driveKiniematics.toSwerveModuleStates(chassisSpeeds);
 
-        // for(int i=0; i<modules.length;i++){
-        //     moduleStates[i].optimize(modules[i].getSteerRotations());
-        // }
+        for(int i=0; i<modules.length;i++){
+            moduleStates[i].optimize(modules[i].getSteerRotations());
+        }
 
         poseEstimator.updateWithTime(Utils.getCurrentTimeSeconds(), new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
 
         for(int i=0;i<modules.length;i++){
-            modules[i].setModuleState(moduleStates[i]);
+            modules[i].setRequestedModuleState(moduleStates[i]);
+            modules[i].periodic();
         }
     }
 
@@ -85,8 +86,12 @@ public class SwerveDriveSubsystem extends SubsystemBase{
         return Arrays.stream(modules).map((SwerveModule m) -> m.getModuleLocation()).toArray(Translation2d[]::new);
     }
 
-    public SwerveModuleState[] getModuleStates(){
-        return Arrays.stream(modules).map((SwerveModule m) -> m.getModuleState()).toArray(SwerveModuleState[]::new);
+    public SwerveModuleState[] getRequestedModuleStates(){
+        return Arrays.stream(modules).map((SwerveModule m) -> m.getRequestedModuleState()).toArray(SwerveModuleState[]::new);
+    }
+
+    public SwerveModuleState[] getActualModuleStates(){
+        return Arrays.stream(modules).map((SwerveModule m) -> m.getActualModuleState()).toArray(SwerveModuleState[]::new);
     }
 
     public SwerveModule[] getModules(){
@@ -98,11 +103,11 @@ public class SwerveDriveSubsystem extends SubsystemBase{
     }
 
     public Angle getCurrentYaw(){
-        return gyro.getYaw().refresh().getValue();
+        return gyro.getRoll().getValue();
     }
 
     public void setChassisSpeed(ChassisSpeeds chassisSpeeds){
-        this.setChassisSpeed(chassisSpeeds, Translation2d.kZero);
+        this.setChassisSpeed(chassisSpeeds, new Translation2d());
     }
 
     public void setChassisSpeed(ChassisSpeeds chassisSpeeds, Translation2d centerOfRotation){
