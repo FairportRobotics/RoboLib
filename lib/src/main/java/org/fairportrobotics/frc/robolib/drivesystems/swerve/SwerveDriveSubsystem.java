@@ -1,4 +1,4 @@
-package org.fairportrobotics.frc.robolib.DriveSystems.SwerveDrive;
+package org.fairportrobotics.frc.robolib.drivesystems.swerve;
 
 import java.util.Arrays;
 
