@@ -17,7 +17,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveDriveSystem implements Subsystem{
 
@@ -29,13 +28,35 @@ public class SwerveDriveSystem implements Subsystem{
 
     private SwerveModule[] modules;
 
+    /**
+     * The max linear speed of the robot in meters per second
+     */
     private double MAX_LINEAR_SPEED = 3.9;
+    /**
+     * The max angular rotation speed in radians per second
+     */
     private double MAX_ANGULAR_SPEED = Math.PI * 2;
 
     private Pigeon2 gyro;
 
+    /**
+     * Only used during simulation.
+     * This variable tracks when the last simulation loop started
+     * to calculate how long it's been since the last simulation loop
+     */
     private double mLastSimTime = 0;
 
+    /**
+     * An implementation of Swerve drive.
+     * 
+     * You should not directly instantiate this class.
+     * You should use SwerveBuilder to create an instance.
+     * @param pigeonId
+     * @param canBus
+     * @param maxLinearVelMetersSecond
+     * @param maxAngularVelRadiansSecond
+     * @param modules
+     */
     public SwerveDriveSystem(int pigeonId, CANBus canBus, double maxLinearVelMetersSecond, double maxAngularVelRadiansSecond, SwerveModule... modules){
 
         MAX_LINEAR_SPEED = maxLinearVelMetersSecond;
@@ -55,7 +76,7 @@ public class SwerveDriveSystem implements Subsystem{
 
     @Override
     public void periodic() {
-        SwerveModuleState[] moduleStates = driveKiniematics.toSwerveModuleStates(chassisSpeeds);
+        SwerveModuleState[] moduleStates = driveKiniematics.toSwerveModuleStates(chassisSpeeds, centerOfRotation);
 
         for(int i=0; i<modules.length;i++){
             moduleStates[i].optimize(modules[i].getSteerRotations());
@@ -81,39 +102,64 @@ public class SwerveDriveSystem implements Subsystem{
         mLastSimTime = Utils.getCurrentTimeSeconds();
     }
 
+    /**
+     * Get the location of the swerve modules
+     * The order of the array is the same order from when they were defined
+     * @return an array of Translation2d
+     */
     public Translation2d[] getModuleLocations(){
         return Arrays.stream(modules).map((SwerveModule m) -> m.getModuleLocation()).toArray(Translation2d[]::new);
     }
 
+    /**
+     * Get the requested state of the swerve modules.
+     * The order of the array is the same order from when they were defined
+     * 
+     * @return an array of SwerveModuleState
+     */
     public SwerveModuleState[] getRequestedModuleStates(){
         return Arrays.stream(modules).map((SwerveModule m) -> m.getRequestedModuleState()).toArray(SwerveModuleState[]::new);
     }
 
+    /**
+     * Get the actual state of the swerve modules.
+     * The order of the array is the same order from when they were defined
+     * @return an array of SwerveModuleState
+     */
     public SwerveModuleState[] getActualModuleStates(){
         return Arrays.stream(modules).map((SwerveModule m) -> m.getActualModuleState()).toArray(SwerveModuleState[]::new);
     }
 
+    /**
+     * Get an array of the SwerveModules configured for this system
+     * @return Array of SwerveModules
+     */
     public SwerveModule[] getModules(){
         return Arrays.stream(modules).toArray(SwerveModule[]::new);
     }
 
-    public int getNumberOfModules(){
-        return modules.length;
+    /**
+     * Get the current yaw angle from the Gyro
+     * @return The current yaw as an Angle
+     */
+    private Angle getCurrentYaw(){
+        return gyro.getYaw().getValue();
     }
 
-    public Angle getCurrentYaw(){
-        return gyro.getRoll().getValue();
-    }
-
+    /**
+     * Get the instance of the gyro
+     * @return
+     */
     public Pigeon2 getGyro(){
         return gyro;
     }
 
-    public void setChassisSpeed(ChassisSpeeds chassisSpeeds){
-        this.setChassisSpeed(chassisSpeeds, new Translation2d());
-    }
-
-    public void setChassisSpeed(ChassisSpeeds chassisSpeeds, Translation2d centerOfRotation){
+    /**
+     * Set robot speed
+     * @param chassisSpeeds
+     * @param centerOfRotation
+     */
+    private void setChassisSpeed(ChassisSpeeds chassisSpeeds, Translation2d centerOfRotation){
         this.chassisSpeeds = chassisSpeeds;
         this.centerOfRotation = centerOfRotation;
     }
@@ -130,7 +176,7 @@ public class SwerveDriveSystem implements Subsystem{
             MAX_LINEAR_SPEED * y,
             MAX_ANGULAR_SPEED * rot,
             Rotation2d.fromDegrees(getCurrentYaw().magnitude())
-        ));
+        ), new Translation2d());
     }
 
     /**
@@ -145,9 +191,13 @@ public class SwerveDriveSystem implements Subsystem{
             MAX_LINEAR_SPEED * y,
             MAX_ANGULAR_SPEED * rot,
             Rotation2d.fromDegrees(getCurrentYaw().magnitude())
-        ));
+        ), new Translation2d());
     }
 
+    /**
+     * Get the current field location of the robot
+     * @return The current pose as a Pose3d
+     */
     public Pose3d getRobotPose(){
         return poseEstimator.getEstimatedPosition();
     }

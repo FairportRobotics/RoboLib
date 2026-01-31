@@ -1,7 +1,5 @@
 package org.fairportrobotics.frc.robolib.drivesystems.swerve;
 
-import java.lang.reflect.Modifier;
-
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
@@ -12,14 +10,12 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
@@ -27,7 +23,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveModule {
@@ -45,7 +40,6 @@ public class SwerveModule {
     private VelocityVoltage driveRequest = new VelocityVoltage(0);
 
     private TalonFX steerMotor;
-    private MotionMagicVoltage steerMMRequest = new MotionMagicVoltage(0);
     private PositionVoltage steerPosRequest = new PositionVoltage(0);
 
     private CANcoder steerEncoder;
@@ -78,17 +72,17 @@ public class SwerveModule {
     ){
 
         steerEncoder = new CANcoder(steerEncoderId, canBusObj);
-        // steerEncoder.getAbsolutePosition().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
-        // steerEncoder.optimizeBusUtilization();
+        steerEncoder.getAbsolutePosition().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
+        steerEncoder.optimizeBusUtilization();
         steerEncoder.getConfigurator().apply(generateCanCoderConfiguration(steerOffset));
 
         driveMotor = new TalonFX(driveMotorId, canBusObj);
-        // driveMotor.getVelocity().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
-        // driveMotor.optimizeBusUtilization();
+        driveMotor.getVelocity().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
+        driveMotor.optimizeBusUtilization();
         driveMotor.getConfigurator().apply(generateDriveTalonConfiguration(driveKP, driveKI, driveKD, driveKV, driveInverted));
 
         steerMotor = new TalonFX(steerMotorId, canBusObj);
-        // steerMotor.optimizeBusUtilization();
+        steerMotor.optimizeBusUtilization();
         steerMotor.getConfigurator().apply(generateSteerTalonConfiguration(steerKP, steerKI, steerKD, steerKS, steerKV, steerKA));
         // steerMotor.setNeutralMode(NeutralModeValue.Brake);
 
@@ -102,12 +96,9 @@ public class SwerveModule {
 
     public void setSteerRotations(Rotation2d rotations){
         steerMotor.setControl(steerPosRequest.withPosition(rotations.getRotations()));
-        // steerMotor.setControl(steerMMRequest.withPosition(rotations.getRotations()));
     }
 
     public Rotation2d getSteerRotations(){
-        // Maybe go back to non-Absolute Pos
-        // Or try reading from the steer motot for the pos
         return new Rotation2d(steerEncoder.getAbsolutePosition().getValue());
     }
 
