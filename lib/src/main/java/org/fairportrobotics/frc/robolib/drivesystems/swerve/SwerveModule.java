@@ -41,7 +41,6 @@ public class SwerveModule {
     private VelocityVoltage driveRequest = new VelocityVoltage(0);
     private TalonFX steerMotor;
     private MotionMagicVoltage steerRequest = new MotionMagicVoltage(0);
-    private PositionVoltage steerPosRequ = new PositionVoltage(0);
     private CANcoder steerEncoder;
 
     private String moduleName;
@@ -152,7 +151,6 @@ public class SwerveModule {
     }
 
     public void periodic(){
-        SmartDashboard.putNumber(moduleName + " steerReq", steerPosRequ.Position);
         SmartDashboard.putNumber(moduleName + " steerPow", steerMotor.getClosedLoopOutput().getValueAsDouble());
         SmartDashboard.putNumber(moduleName + " steer error", steerMotor.getClosedLoopError().getValueAsDouble());
         SmartDashboard.putNumber(moduleName + " steer setpoint", steerMotor.getClosedLoopReference().getValueAsDouble());
@@ -207,6 +205,9 @@ public class SwerveModule {
         ).withClosedLoopGeneral(
             new ClosedLoopGeneralConfigs()
             .withContinuousWrap(true)
+        ).withMotorOutput(
+            new MotorOutputConfigs()
+                .withInverted(InvertedValue.CounterClockwise_Positive)
         );
     }
 
@@ -214,7 +215,7 @@ public class SwerveModule {
         return new CANcoderConfiguration().withMagnetSensor(
             new MagnetSensorConfigs()
                 .withMagnetOffset(-steerOffset)
-                .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
+                .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
                 .withAbsoluteSensorDiscontinuityPoint(0.5)
             );
     }
