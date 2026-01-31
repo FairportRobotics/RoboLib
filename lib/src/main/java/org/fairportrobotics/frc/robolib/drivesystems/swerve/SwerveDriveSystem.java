@@ -16,9 +16,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class SwerveDriveSubsystem extends SubsystemBase{
+public class SwerveDriveSystem implements Subsystem{
 
     private SwerveDriveKinematics driveKiniematics;
     private ChassisSpeeds chassisSpeeds;
@@ -35,7 +36,7 @@ public class SwerveDriveSubsystem extends SubsystemBase{
 
     private double mLastSimTime = 0;
 
-    public SwerveDriveSubsystem(int pigeonId, CANBus canBus, double maxLinearVelMetersSecond, double maxAngularVelRadiansSecond, SwerveModule... modules){
+    public SwerveDriveSystem(int pigeonId, CANBus canBus, double maxLinearVelMetersSecond, double maxAngularVelRadiansSecond, SwerveModule... modules){
 
         MAX_LINEAR_SPEED = maxLinearVelMetersSecond;
         MAX_ANGULAR_SPEED = maxAngularVelRadiansSecond;
@@ -54,7 +55,6 @@ public class SwerveDriveSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        super.periodic();
         SwerveModuleState[] moduleStates = driveKiniematics.toSwerveModuleStates(chassisSpeeds);
 
         for(int i=0; i<modules.length;i++){
@@ -71,8 +71,6 @@ public class SwerveDriveSubsystem extends SubsystemBase{
 
     @Override
     public void simulationPeriodic() {
-        super.simulationPeriodic();
-
         double deltaTimeSecond = (mLastSimTime - Utils.getCurrentTimeSeconds());
 
         if(mLastSimTime != 0){
@@ -105,6 +103,10 @@ public class SwerveDriveSubsystem extends SubsystemBase{
 
     public Angle getCurrentYaw(){
         return gyro.getRoll().getValue();
+    }
+
+    public Pigeon2 getGyro(){
+        return gyro;
     }
 
     public void setChassisSpeed(ChassisSpeeds chassisSpeeds){

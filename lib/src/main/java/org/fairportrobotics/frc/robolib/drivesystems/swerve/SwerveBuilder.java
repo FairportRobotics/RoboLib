@@ -57,8 +57,8 @@ public class SwerveBuilder {
         return this;
     }
 
-    public SwerveDriveSubsystem build() {
-        return new SwerveDriveSubsystem(pigeonId, canBusObj, maxLinearVelMetersSecond, maxAngularVelRadiansSecond,
+    public SwerveDriveSystem build() {
+        return new SwerveDriveSystem(pigeonId, canBusObj, maxLinearVelMetersSecond, maxAngularVelRadiansSecond,
                 modules.toArray(size -> new SwerveModule[size]));
     }
 

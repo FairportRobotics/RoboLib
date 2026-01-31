@@ -39,8 +39,10 @@ public class SwerveModule {
 
     private TalonFX driveMotor;
     private VelocityVoltage driveRequest = new VelocityVoltage(0);
+
     private TalonFX steerMotor;
     private MotionMagicVoltage steerRequest = new MotionMagicVoltage(0);
+
     private CANcoder steerEncoder;
 
     private String moduleName;
@@ -136,6 +138,18 @@ public class SwerveModule {
         this.setSteerRotations(state.angle);
         this.setDriveSpeed(state.speedMetersPerSecond);
         requestedModuleState = state;
+    }
+
+    public TalonFX getSteerMotor(){
+        return steerMotor;
+    }
+
+    public TalonFX getDriveMotor(){
+        return driveMotor;
+    }
+
+    public CANcoder getSteerEncoder(){
+        return steerEncoder;
     }
 
     public SwerveModuleState getRequestedModuleState(){
