@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -26,11 +27,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveModule {
 
     private final int CAN_UPDATE_FREQUENCY = 50;
+    private final double STEER_MAX_CURRENT = 60;
+    private final double DRIVE_MAX_CURRENT = 80;
 
     private final double gearRatio;
     private final double wheelDiameterInMeters;
@@ -41,7 +45,8 @@ public class SwerveModule {
     private VelocityVoltage driveRequest = new VelocityVoltage(0);
 
     private TalonFX steerMotor;
-    private MotionMagicVoltage steerRequest = new MotionMagicVoltage(0);
+    private MotionMagicVoltage steerMMRequest = new MotionMagicVoltage(0);
+    private PositionVoltage steerPosRequest = new PositionVoltage(0);
 
     private CANcoder steerEncoder;
 
@@ -96,9 +101,8 @@ public class SwerveModule {
     }
 
     public void setSteerRotations(Rotation2d rotations){
-        // steerMotor.setVoltage(steerPid.calculate(getSteerRotations().getRadians(), rotations.getRadians()));
-        // steerMotor.setControl(steerRequest.withSlot(0).withPosition(rotations.getRotations()));
-        steerMotor.setControl(steerRequest.withPosition(rotations.getRotations()));
+        steerMotor.setControl(steerPosRequest.withPosition(rotations.getRotations()));
+        // steerMotor.setControl(steerMMRequest.withPosition(rotations.getRotations()));
     }
 
     public Rotation2d getSteerRotations(){
@@ -127,7 +131,7 @@ public class SwerveModule {
      * @return
      */
     public double getDriveWheelSpeed(){
-        return (driveMotor.getVelocity().refresh().getValueAsDouble() * gearRatio) / (Math.PI * wheelDiameterInMeters);
+        return (driveMotor.getVelocity().refresh().getValueAsDouble() / gearRatio) * (Math.PI * wheelDiameterInMeters);
     }
 
     public Translation2d getModuleLocation(){
@@ -177,7 +181,7 @@ public class SwerveModule {
     }
 
     private double getModuleDistance(){
-        double distance = (this.driveMotor.getPosition(true).getValueAsDouble() * gearRatio) / (Math.PI * wheelDiameterInMeters);
+        double distance = (this.driveMotor.getPosition(true).getValueAsDouble() * gearRatio) * (Math.PI * wheelDiameterInMeters);
         return distance;
     }
 
@@ -192,6 +196,10 @@ public class SwerveModule {
         .withMotorOutput(
             new MotorOutputConfigs()
                 .withInverted(driveInverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive)
+        ).withCurrentLimits(
+            new CurrentLimitsConfigs()
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(DRIVE_MAX_CURRENT)
         );
     }
 
@@ -221,7 +229,11 @@ public class SwerveModule {
             .withContinuousWrap(true)
         ).withMotorOutput(
             new MotorOutputConfigs()
-                .withInverted(InvertedValue.CounterClockwise_Positive)
+                .withInverted(InvertedValue.Clockwise_Positive)
+        ).withCurrentLimits(
+            new CurrentLimitsConfigs()
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(STEER_MAX_CURRENT)
         );
     }
 
