@@ -25,14 +25,14 @@ repositories {
     mavenLocal()
     gradlePluginPortal()
 
-    maven {url "https://maven.photonvision.org/repository/snapshots"}
-    maven {url "https://maven.photonvision.org/repository/internal"}
     maven {url "https://maven.ctr-electronics.com/release/"}
+    maven {url "https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release/"}
 }
 
 dependencies {
     // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // WPI Lib
     implementation "edu.wpi.first.cscore:cscore-java:$wpiVersion"
@@ -47,6 +47,9 @@ dependencies {
 
     // CTRE Phoenix 6
     implementation "com.ctre.phoenix6:wpiapi-java:${ctreVersion}"
+
+    // AdvantageKit
+    implementation "org.littletonrobotics.akit:akit-java:${advantageKitVersion}"
 
 }
 
