@@ -138,7 +138,7 @@ public class SwerveBuilder {
          * <br><br>
          * Refer here for more info: https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/basic-pid-control.html
          * 
-         * @param driveKP Integral gain in Volts
+         * @param driveKI Integral gain in Volts
          * @return itself
          */
         public SwerveModuleBuilder withDriveKI(double driveKI) {
@@ -152,7 +152,7 @@ public class SwerveBuilder {
          * <br><br>
          * Refer here for more info: https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/basic-pid-control.html
          * 
-         * @param driveKP Derrivative gain in Volts
+         * @param driveKD Derrivative gain in Volts
          * @return itself
          */
         public SwerveModuleBuilder withDriveKD(double driveKD) {
@@ -210,7 +210,7 @@ public class SwerveBuilder {
          * Set the steer motors closed loop integral gain value
          * <br><br>
          * Refer here for more info: https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/basic-pid-control.html
-         * @param steerKP Integral gain in Volts
+         * @param steerKI Integral gain in Volts
          * @return itself
          */
         public SwerveModuleBuilder withSteerKI(double steerKI) {
@@ -222,7 +222,7 @@ public class SwerveBuilder {
          * Set the steer motors closed loop derrivative gain value
          * <br><br>
          * Refer here for more info: https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/basic-pid-control.html
-         * @param steerKP Derrivative gain in Volts
+         * @param steerKD Derrivative gain in Volts
          * @return itself
          */
         public SwerveModuleBuilder withSteerKD(double steerKD) {
