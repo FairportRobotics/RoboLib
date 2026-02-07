@@ -59,9 +59,9 @@ public class Velocity3d {
     }
 
 
-    /*
-     *  Cartesian Coordinate Getters
-     */
+    //
+    //  Cartesian Coordinate Getters
+    //
 
     /**
      * @return  The x-axis component of the velocity
@@ -104,9 +104,9 @@ public class Velocity3d {
     }
 
 
-    /*
-     *  Cylindrical Coordinate getters
-     */
+    //
+    //  Cylindrical Coordinate getters
+    //
 
 
     /**
@@ -144,9 +144,9 @@ public class Velocity3d {
     }
 
 
-    /*
-     *  Spherical Coordinate getters
-     */
+    //
+    //  Spherical Coordinate getters
+    //
 
 
     /**
@@ -176,10 +176,15 @@ public class Velocity3d {
     }
 
 
-    /*
-     * Mathematical operations
-     */
+    //
+    // Mathematical operations
+    //
 
+    /**
+     * Subtract other from this vector and return the resulting vector
+     * @param other The vector to subtract from this one
+     * @return The difference of this vector from other
+     */
     public Velocity3d minus(Velocity3d other) {
         return new Velocity3d(
             this.vX.minus(other.vX),
@@ -189,6 +194,11 @@ public class Velocity3d {
     }
 
 
+    /**
+     * Multiply the velocity by time in order to get a displacement
+     * @param time The time to compute over
+     * @return The resulting displacement
+     */
     public Translation3d times(Time time) {
         return new Translation3d(
             this.vX.times(time),
@@ -198,4 +208,31 @@ public class Velocity3d {
     }
 
 
+    //
+    //  Overrides
+    //
+
+    @Override
+    public int hashCode() {
+        return this.vX.hashCode() ^ this.vY.hashCode() ^ this.vZ.hashCode();
+    }
+
+
+    @Override
+    public String toString() {
+        return String.format("Velocity3d(X: %s, Y: %s, Z: %s)", vX, vY, vZ);
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if(Velocity3d.class.isInstance(obj)) {
+            Velocity3d otherVelocity = (Velocity3d) obj;
+            return
+                this.vX == otherVelocity.getVX() &&
+                this.vY == otherVelocity.getVY() &&
+                this.vZ == otherVelocity.getVZ();
+        }
+        return false;
+    }
 }
