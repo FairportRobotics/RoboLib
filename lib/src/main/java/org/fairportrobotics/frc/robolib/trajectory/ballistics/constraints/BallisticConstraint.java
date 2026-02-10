@@ -1,7 +1,7 @@
 package org.fairportrobotics.frc.robolib.trajectory.ballistics.constraints;
 
-import org.fairportrobotics.frc.robolib.trajectory.Velocity3d;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.models.BallisticModel;
+
 
 public abstract class BallisticConstraint {
     protected double weight;
@@ -42,14 +42,14 @@ public abstract class BallisticConstraint {
     /**
      * Evaluate a given solution's fitness against this constraint
      *
-     * TODO: Expand this with additional parameters
-     *
      * @param <M> The type of BallisticModel
      * @param <P> The parameter type of M
-     * @param model The model used to compute candidate
-     * @param candidate The candidate velocity computed by model
+     * @param model The model used to compute the candidate
+     * @param evalParams The candidate parameters used in evaluation
      * @return A penalty value (from 0 to 1.0) for this match (null if candidate
      *  is invalid). Used with weight to determine candidate fitness
      */
-    public abstract <M extends BallisticModel<P>, P> Double evaluate(M model, Velocity3d candidate);
+    public abstract <M extends BallisticModel<P>, P> Double evaluate(
+        M model, BCEvalParams evalParams
+    );
 }
