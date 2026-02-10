@@ -11,7 +11,7 @@ public class Velocity3d {
     private final LinearVelocity vY;
     private final LinearVelocity vZ;
 
-    private LinearVelocity  cache_squareMagnitudeVelocity;
+    private Double          cache_squareMagnitudeVelocity;
     private LinearVelocity  cache_magnitudeVelocity;
     private Angle           cache_eleveationAngle;
     private Angle           cache_azimuthAngle;
@@ -22,10 +22,11 @@ public class Velocity3d {
         this.vY = vY.copy();
         this.vZ = vZ.copy();
 
-        this.cache_magnitudeVelocity    = null;
-        this.cache_eleveationAngle      = null;
-        this.cache_azimuthAngle         = null;
-        this.cache_horizontalVelocity   = null;
+        this.cache_squareMagnitudeVelocity  = null;
+        this.cache_magnitudeVelocity        = null;
+        this.cache_eleveationAngle          = null;
+        this.cache_azimuthAngle             = null;
+        this.cache_horizontalVelocity       = null;
     }
 
 
@@ -89,16 +90,16 @@ public class Velocity3d {
 
 
     /**
-     * @return The squared magnitude of the velocity vector
+     * @return The squared magnitude of the velocity vector in m^2s^-2
      */
-    public LinearVelocity getSquareMagnitude() {
+    public double getSquareMagnitude() {
         if(this.cache_squareMagnitudeVelocity == null) {
             double vX_mps = this.vX.in(Units.MetersPerSecond);
             double vY_mps = this.vY.in(Units.MetersPerSecond);
             double vZ_mps = this.vZ.in(Units.MetersPerSecond);
-            this.cache_magnitudeVelocity = Units.MetersPerSecond.of(
-                Math.pow(vX_mps, 2) + Math.pow(vY_mps, 2) + Math.pow(vZ_mps, 2)
-            );
+            this.cache_squareMagnitudeVelocity =    Math.pow(vX_mps, 2) +
+                                                    Math.pow(vY_mps, 2) +
+                                                    Math.pow(vZ_mps, 2);
         }
         return this.cache_squareMagnitudeVelocity;
     }
@@ -109,7 +110,7 @@ public class Velocity3d {
     public LinearVelocity getMagnitude() {
         if(this.cache_magnitudeVelocity == null) {
             this.cache_magnitudeVelocity = Units.MetersPerSecond.of(Math.pow(
-                this.getSquareMagnitude().in(Units.MetersPerSecond), 0.5
+                this.getSquareMagnitude(), 0.5
             ));
         }
         return this.cache_magnitudeVelocity;
@@ -120,9 +121,16 @@ public class Velocity3d {
     //  Cylindrical Coordinate getters
     //
 
+    /**
+     * @return  The magnitude of the vertical component of the velocity (alias of this.getVZ())
+     */
+    public LinearVelocity getVeritcalVelocity() {
+        return this.getVZ();
+    }
+
 
     /**
-     * @return  The the magnitude of the horizontal component of the velocity
+     * @return  The magnitude of the horizontal component of the velocity
      */
     public LinearVelocity getHorizontalVelocity() {
         if (this.cache_horizontalVelocity == null) {
