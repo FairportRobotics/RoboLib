@@ -1,27 +1,21 @@
 package org.fairportrobotics.frc.robolib.trajectory.ballistics.calculators;
 
-import org.fairportrobotics.frc.robolib.trajectory.Velocity3d;
+import org.fairportrobotics.frc.robolib.trajectory.ballistics.constraints.BCEvalParams;
 
-public class BCResult<P> {
-    public final Double     velPenalty;     /// The penalty for the computed launcher velocity (null if invalid)
-    public final Velocity3d velGlobal;      /// The computed launcher velocity (in the global coorinate space)
-    public final Velocity3d velRelative;    /// The computed launcher velocity (in the robot-relative coordinate space)
-    public final P          velParam;       /// The model parameter that yielded velGlobal
+public class BCResult {
+    public final Double         penalty;    /// The penalty for the computed launcher velocity (null if invalid)
+    public final BCEvalParams   evalParams; /// The BCEvalParams instance that produced the best penalty
 
 
     public BCResult(
-        Double      velPenalty,
-        Velocity3d  velGlobal,
-        Velocity3d  velRelative,
-        P           velParam
+        Double          penalty,
+        BCEvalParams    evalParams
     ) {
-        this.velPenalty     = velPenalty;
-        this.velGlobal      = velGlobal;
-        this.velRelative    = velRelative;
-        this.velParam       = velParam;
+        this.penalty    = penalty;
+        this.evalParams = evalParams;
     }
 
     public boolean isValid() {
-        return this.velPenalty != null;
+        return this.penalty != null;
     }
 }
