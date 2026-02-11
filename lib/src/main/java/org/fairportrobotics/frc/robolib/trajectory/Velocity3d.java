@@ -68,7 +68,7 @@ public class Velocity3d {
     /**
      * @return  The x-axis component of the velocity
      */
-    public LinearVelocity getVX() {
+    public LinearVelocity getXVelocity() {
         return vX;
     }
 
@@ -76,7 +76,7 @@ public class Velocity3d {
     /**
      * @return  The y-axis component of the velocity
      */
-    public LinearVelocity getVY() {
+    public LinearVelocity getYVelocity() {
         return vY;
     }
 
@@ -84,7 +84,7 @@ public class Velocity3d {
     /**
      * @return  The z-axis component of the velocity
      */
-    public LinearVelocity getVZ() {
+    public LinearVelocity getZVelocity() {
         return vZ;
     }
 
@@ -125,7 +125,7 @@ public class Velocity3d {
      * @return  The magnitude of the vertical component of the velocity (alias of this.getVZ())
      */
     public LinearVelocity getVeritcalVelocity() {
-        return this.getVZ();
+        return this.getZVelocity();
     }
 
 
@@ -134,8 +134,8 @@ public class Velocity3d {
      */
     public LinearVelocity getHorizontalVelocity() {
         if (this.cache_horizontalVelocity == null) {
-            double vX_mps = this.getVX().in(Units.MetersPerSecond);
-            double vY_mps = this.getVY().in(Units.MetersPerSecond);
+            double vX_mps = this.getXVelocity().in(Units.MetersPerSecond);
+            double vY_mps = this.getYVelocity().in(Units.MetersPerSecond);
             this.cache_horizontalVelocity = Units.MetersPerSecond.of(
                 Math.pow(
                     Math.pow(vX_mps, 2) + Math.pow(vY_mps, 2),
@@ -156,8 +156,8 @@ public class Velocity3d {
      */
     public Angle getAzimuthAngle() {
         if (this.cache_azimuthAngle == null) {
-            double vX_mps = this.getVX().in(Units.MetersPerSecond);
-            double vY_mps = this.getVY().in(Units.MetersPerSecond);
+            double vX_mps = this.getXVelocity().in(Units.MetersPerSecond);
+            double vY_mps = this.getYVelocity().in(Units.MetersPerSecond);
             this.cache_azimuthAngle = Units.Radians.of(Math.atan2(vY_mps, vX_mps));
         }
         return this.cache_azimuthAngle;
@@ -180,7 +180,7 @@ public class Velocity3d {
      */
     public Angle getElevation() {
         if(this.cache_eleveationAngle == null) {
-            double vZ_mps       = this.getVZ().in(Units.MetersPerSecond);
+            double vZ_mps       = this.getZVelocity().in(Units.MetersPerSecond);
             double vHori_mps    = this.getHorizontalVelocity().in(Units.MetersPerSecond);
             this.cache_eleveationAngle = Units.Radians.of(Math.atan2(vZ_mps, vHori_mps));
         }
@@ -197,7 +197,7 @@ public class Velocity3d {
 
 
     //
-    // Mathematical operations
+    // Transforms and Conversions
     //
 
     /**
@@ -210,6 +210,19 @@ public class Velocity3d {
             this.vX.minus(other.vX),
             this.vY.minus(other.vY),
             this.vZ.minus(other.vZ)
+        );
+    }
+
+    /**
+     * Rotate the vector by adding a given angle to the azimuth
+     * @param rotAngle The angle to add to the azimuth
+     * @return A new, rotated Velocity3d instance
+     */
+    public Velocity3d rotate(Angle rotAngle) {
+        return new Velocity3d(
+            this.getHorizontalVelocity(),
+            this.getVeritcalVelocity(),
+            this.getAzimuthAngle().plus(rotAngle)
         );
     }
 
@@ -249,9 +262,9 @@ public class Velocity3d {
         if(Velocity3d.class.isInstance(obj)) {
             Velocity3d otherVelocity = (Velocity3d) obj;
             return
-                this.vX == otherVelocity.getVX() &&
-                this.vY == otherVelocity.getVY() &&
-                this.vZ == otherVelocity.getVZ();
+                this.vX == otherVelocity.getXVelocity() &&
+                this.vY == otherVelocity.getYVelocity() &&
+                this.vZ == otherVelocity.getZVelocity();
         }
         return false;
     }
