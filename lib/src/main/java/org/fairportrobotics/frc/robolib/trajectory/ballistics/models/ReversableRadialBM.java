@@ -56,4 +56,14 @@ public abstract class ReversableRadialBM<P> extends BallisticModel<P> {
         );
         return this.getTimeAtRadius(candidate, radialDistance);
     }
+
+    /**
+     * Get the time to target on a given candidate trajectory
+     * 
+     * @param candidate The generated velocity to compute against
+     * @return The time it takes to travel to the target position
+     */
+    public Time getTimeAtTarget(Velocity3d candidate) {
+        return this.getTimeAtX(candidate, posTarget.getMeasureX());
+    }
 }
