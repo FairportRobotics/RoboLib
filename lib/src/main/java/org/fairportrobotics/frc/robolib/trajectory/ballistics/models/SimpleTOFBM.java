@@ -1,6 +1,7 @@
 package org.fairportrobotics.frc.robolib.trajectory.ballistics.models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.fairportrobotics.frc.robolib.trajectory.Velocity3d;
 
@@ -24,6 +25,8 @@ public class SimpleTOFBM extends ReversableRadialBM<Time> {
     protected final Distance        relativeHorizontalDistance;
     protected final Angle           azimuth;
 
+    private HashSet<Double>         computedSeconds;
+
     public SimpleTOFBM(
         Translation3d posLaunch, Translation3d posTarget,
         Time tofMin, Time tofMax, Time tofStep
@@ -46,6 +49,9 @@ public class SimpleTOFBM extends ReversableRadialBM<Time> {
         this.azimuth = Units.Radians.of(
             Math.atan2(targetPosRelative.getY(), targetPosRelative.getX()
         ));
+
+        // Init the seen param tracking
+        this.computedSeconds = new HashSet<>();
     }
 
 
@@ -55,6 +61,7 @@ public class SimpleTOFBM extends ReversableRadialBM<Time> {
 
 
     public Velocity3d getCandidateVelocity(Time param) {
+        this.computedSeconds.add(param.in(Units.Seconds));
         return new Velocity3d(
             this.relativeHorizontalDistance.div(param),
             this.targetPosRelative.getMeasureZ().div(param)
@@ -93,4 +100,15 @@ public class SimpleTOFBM extends ReversableRadialBM<Time> {
     public Time getTimeAtRadius(Velocity3d candidate, Distance radialDistance) {
         return radialDistance.div(candidate.getHorizontalVelocity());
     }
+
+
+    public boolean paramComputed(Time param) {
+        return this.computedSeconds.contains(param.in(Units.Seconds));
+    }
+
+
+    public void paramComputedReset() {
+        this.computedSeconds = new HashSet<>();
+    }
+
 }

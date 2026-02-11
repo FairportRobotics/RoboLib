@@ -46,4 +46,15 @@ public abstract class BallisticModel<P> {
      */
     public abstract Translation3d positionAtTime(Velocity3d velocity, Time time);
 
+    /**
+     * Check if a given parameter has had a computed velocity
+     * @param param The param to check
+     * @return true iff the parameter has had a computed solution
+     */
+    public abstract boolean paramComputed(P param);
+
+    /**
+     * Mark all params as not computed for paramComputed
+     */
+    public abstract void paramComputedReset();
 }
