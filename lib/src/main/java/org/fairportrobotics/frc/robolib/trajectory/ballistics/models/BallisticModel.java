@@ -15,6 +15,11 @@ public abstract class BallisticModel<P> {
     }
 
     /**
+     * @return Returns a recommended starting parameter
+     */
+    public abstract P getInitParam();
+
+    /**
      * Get an abstract velocity (in the same coordinate space as posLaunch and
      * posTarget) which will pass thru
      *
