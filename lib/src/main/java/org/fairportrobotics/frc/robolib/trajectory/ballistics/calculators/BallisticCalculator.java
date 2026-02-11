@@ -37,29 +37,67 @@ public abstract class BallisticCalculator {
     //
 
     /**
-     * Public solution
+     * Compute the best solution for given initial conditions (pulling parameter
+     * from model.getInitParam())
+     *
+     * @param <M> The type of model to compute against
+     * @param <P> The candidate parameter type of the model
+     * @param model The model to compute against
+     * @param robotVelocity The velocity of the robot (in field coordinates)
+     * @param robotAngle The robot's current heading (in field coordinates)
+     * @param shooterVelocity The shooter's current launch velocity (in field coordinates)
+     * @return The generated BCResult
+     */
+    public <M extends BallisticModel<P>, P> BCResult computeSolution(
+        M           model,
+        Velocity3d  robotVelocity,
+        Angle       robotAngle,
+        Velocity3d  shooterVelocity
+    ) {
+        return this.computeSolution(
+            model, model.getInitParam(), robotVelocity, robotAngle, shooterVelocity
+        );
+    }
+
+
+    /**
+     * Compute the best solution for given initial conditions
+     *
      * @param <M> The type of model to compute against
      * @param <P> The candidate parameter type of the model
      * @param model The model to compute against
      * @param initParam The seed parameter (to start computation)
-     * @param velRobot The velocity of the robot (in the model's coordinate system)
-     * @param velShooter The velocity currently imparted by the shooter (in the model's coordinate system)
-     * @param robotHeading The heading of the robot (in the model's coordinate system)
+     * @param robotVelocity The velocity of the robot (in field coordinates)
+     * @param robotAngle The robot's current heading (in field coordinates)
+     * @param shooterVelocity The shooter's current launch velocity (in field coordinates)
      * @return The generated BCResult
      */
-    public abstract <M extends BallisticModel<P>, P> BCResult<P> computeSolution(
-        M model, Velocity3d velRobot, Velocity3d velShooter,
-        Angle robotHeading, boolean quickMode
+    public abstract <M extends BallisticModel<P>, P> BCResult computeSolution(
+        M           model,
+        P           initParam,
+        Velocity3d  robotVelocity,
+        Angle       robotAngle,
+        Velocity3d  shooterVelocity
     );
 
 
+    /**
+     * Get the average penalty for a given set of params
+     *
+     * @param <M> The type of model to compute against
+     * @param <P> The candidate parameter type of the model
+     * @param model The model to compute against
+     * @param evalParams The eval function param block
+     * @return The weighted average of penalties from velocity diferences and
+     *  constraints (null if evalParams fail any constraints)
+     */
     protected <M extends BallisticModel<P>, P> Double evaluateCandidate(
         M model, BCEvalParams evalParams
     ) {
         // Get the weight component for velocity difference
         Velocity3d velShooterDiff =
-            evalParams.getCandidateGlobalShooterVelocity()
-            .minus(evalParams.getCurrentGlobalShooterVelocity());
+            evalParams.getCandidateShooterVelocity().minus(evalParams.getCurrentShooterVelocity());
+
         double numerator    = velShooterDiff.getSquareMagnitude() * this.velocityDiffWeight;
         double denominator  = this.velocityDiffWeight;
 
