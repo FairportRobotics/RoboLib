@@ -13,34 +13,35 @@ public class BCEvalParams {
     //
 
     // Robot motion params
-    private final Velocity3d currentGlobalRobotVelocity;
-    private final Angle      currentGlobalRobotAngle;
-    private final Velocity3d currentGlobalShooterVelocity;
+    private final Velocity3d robotVelocity;
+    private final Angle      robotAngle;
+    private final Velocity3d currentShooterVelocity;
 
     // Candidate params
-    private final Velocity3d candidateGlobalTotalVelocity;
+    private final Velocity3d candidateVelocity;
 
     // Composite value cache
-    private Velocity3d cache_candidateGlobalShooterVelocity;
-    private Velocity3d cache_candidateRelativeShooterVelocity;
+    private Velocity3d cache_candidateShooterVelocity;
+    private Velocity3d cache_candidateShooterVelocityRelative;
 
     //
     // Setup
     //
 
     public BCEvalParams(
-        Velocity3d currentGlobalRobotVelocity,
-        Angle      currentGlobalRobotAngle,
-        Velocity3d currentGlobalShooterVelocity,
-        Velocity3d candidateGlobalTotalVelocity
+        Velocity3d robotVelocity,
+        Angle      robotAngle,
+        Velocity3d currentShooterVelocity,
+        Velocity3d candidateVelocity
     ) {
-        this.currentGlobalRobotVelocity     = currentGlobalRobotVelocity;
-        this.currentGlobalRobotAngle        = currentGlobalRobotAngle;
-        this.currentGlobalShooterVelocity   = currentGlobalShooterVelocity;
-        this.candidateGlobalTotalVelocity   = candidateGlobalTotalVelocity;
+        this.robotVelocity          = robotVelocity;
+        this.robotAngle             = robotAngle;
+        this.currentShooterVelocity = currentShooterVelocity;
 
-        this.cache_candidateGlobalShooterVelocity   = null;
-        this.cache_candidateRelativeShooterVelocity = null;
+        this.candidateVelocity      = candidateVelocity;
+
+        this.cache_candidateShooterVelocity   = null;
+        this.cache_candidateShooterVelocityRelative = null;
     }
 
 
@@ -51,31 +52,32 @@ public class BCEvalParams {
     /**
      * @return The robot's current velocity (in field coordinates)
      */
-    public Velocity3d getCurrentGlobalRobotVelocity() {
-        return this.currentGlobalRobotVelocity;
+    public Velocity3d getRobotVelocity() {
+        return this.robotVelocity;
     }
 
 
     /**
      * @return The robot's current heading angle (in field coordinates)
      */
-    public Angle      getCurrentGlobalRobotAngle() {
-        return this.currentGlobalRobotAngle;
+    public Angle      getRobotAngle() {
+        return this.robotAngle;
     }
 
 
     /**
      * @return The shooter's current launch velocity (in field coordinates)
      */
-    public Velocity3d getCurrentGlobalShooterVelocity() {
-        return this.currentGlobalShooterVelocity;
+    public Velocity3d getCurrentShooterVelocity() {
+        return this.currentShooterVelocity;
     }
+
 
     /**
      * @return The candidate total (robot + shooter) velocity (in field coordinates)
      */
-    public Velocity3d getCandidateGlobalTotalVelocity() {
-        return this.candidateGlobalTotalVelocity;
+    public Velocity3d getCandidateVelocity() {
+        return this.candidateVelocity;
     }
 
     //
@@ -86,30 +88,25 @@ public class BCEvalParams {
      * @return The candidate shooter velocity (in field coordinates) at current
      *  robot velocity
      */
-    public Velocity3d getCandidateGlobalShooterVelocity() {
-        if(this.cache_candidateGlobalShooterVelocity == null) {
-            this.cache_candidateGlobalShooterVelocity =
-                this.candidateGlobalTotalVelocity
-                    .minus(this.currentGlobalRobotVelocity);
+    public Velocity3d getCandidateShooterVelocity() {
+        if(this.cache_candidateShooterVelocity == null) {
+            this.cache_candidateShooterVelocity =
+                this.candidateVelocity
+                    .minus(this.robotVelocity);
         }
-        return this.cache_candidateGlobalShooterVelocity;
+        return this.cache_candidateShooterVelocity;
     }
 
     /**
      * @return The candidate shooter velocity (in robot coordinates) at current
      *  robot velocity and heading
      */
-    public Velocity3d getCandidateRelativeShooterVelocity() {
-        if(this.cache_candidateRelativeShooterVelocity == null) {
-            this.cache_candidateRelativeShooterVelocity =
-                new Velocity3d(
-                    this.getCandidateGlobalShooterVelocity().getHorizontalVelocity(),
-                    this.getCandidateGlobalShooterVelocity().getVeritcalVelocity(),
-                    this.getCandidateGlobalShooterVelocity().getAzimuthAngle()
-                        .minus(this.getCurrentGlobalRobotAngle())
-                );
+    public Velocity3d getCandidateShooterVelocityRelative() {
+        if(this.cache_candidateShooterVelocityRelative == null) {
+            this.cache_candidateShooterVelocityRelative =
+                this.getCandidateShooterVelocity().rotate(this.robotAngle.times(-1));
         }
-        return this.cache_candidateRelativeShooterVelocity;
+        return this.cache_candidateShooterVelocityRelative;
     }
 
 }
