@@ -22,9 +22,7 @@ public class GreedyBallisticCalculator extends BallisticCalculator {
         Angle       robotAngle,
         Velocity3d  shooterVelocity
     ) {
-        if(initParam == null) {
-            initParam = model.getInitParam();
-        }
+        model.paramComputedReset();
 
         LinkedList<P> candidate_params = new LinkedList<>();
         candidate_params.addFirst(initParam);
@@ -32,8 +30,9 @@ public class GreedyBallisticCalculator extends BallisticCalculator {
         while(!candidate_params.isEmpty()) {
             // Evaluate the candidates
             P           param       = candidate_params.removeFirst();
-            Velocity3d  candidate   = model.getCandidateVelocity(param);
+            if(model.paramComputed(param)) continue;
 
+            Velocity3d  candidate   = model.getCandidateVelocity(param);
             if(candidate != null) {
                 BCEvalParams    evalParams = new BCEvalParams(robotVelocity, robotAngle, shooterVelocity, candidate);
                 Double          penalty = this.evaluateCandidate(model, evalParams);
