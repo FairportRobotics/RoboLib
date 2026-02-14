@@ -13,7 +13,7 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.Time;
 
 
-public class SimpleTOFBM extends ReversableRadialBM<Time> {
+public class ParabolicTimeOfFlightBM extends ReversableRadialBM<Time> {
 
     private final LinearAcceleration k_gravity = Units.MetersPerSecondPerSecond.of(-9.81);
 
@@ -27,7 +27,7 @@ public class SimpleTOFBM extends ReversableRadialBM<Time> {
 
     private HashSet<Double>         computedSeconds;
 
-    public SimpleTOFBM(
+    public ParabolicTimeOfFlightBM(
         Translation3d posLaunch, Translation3d posTarget,
         Time tofMin, Time tofMax, Time tofStep
     ) {
