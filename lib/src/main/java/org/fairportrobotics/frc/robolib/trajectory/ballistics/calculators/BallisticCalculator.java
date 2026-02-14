@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.fairportrobotics.frc.robolib.trajectory.Velocity3d;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.constraints.BCEvalParams;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.constraints.BallisticConstraint;
+import org.fairportrobotics.frc.robolib.trajectory.ballistics.exceptions.BallisticException;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.models.BallisticModel;
 
 import edu.wpi.first.units.measure.Angle;
@@ -53,7 +54,7 @@ public abstract class BallisticCalculator {
         Velocity3d  robotVelocity,
         Angle       robotAngle,
         Velocity3d  shooterVelocity
-    ) {
+    ) throws BallisticException {
         return this.computeSolution(
             model, model.getInitParam(), robotVelocity, robotAngle, shooterVelocity
         );
@@ -78,7 +79,7 @@ public abstract class BallisticCalculator {
         Velocity3d  robotVelocity,
         Angle       robotAngle,
         Velocity3d  shooterVelocity
-    );
+    ) throws BallisticException;
 
 
     /**
@@ -93,7 +94,7 @@ public abstract class BallisticCalculator {
      */
     protected <M extends BallisticModel<P>, P> Double evaluateCandidate(
         M model, BCEvalParams evalParams
-    ) {
+    ) throws BallisticException {
         // Get the weight component for velocity difference
         Velocity3d velShooterDiff =
             evalParams.getCandidateShooterVelocity().minus(evalParams.getCurrentShooterVelocity());

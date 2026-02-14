@@ -1,7 +1,7 @@
 package org.fairportrobotics.frc.robolib.trajectory.ballistics.constraints;
 
+import org.fairportrobotics.frc.robolib.trajectory.ballistics.exceptions.BallisticException;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.models.BallisticModel;
-
 
 public abstract class BallisticConstraint {
     protected double weight;
@@ -51,5 +51,5 @@ public abstract class BallisticConstraint {
      */
     public abstract <M extends BallisticModel<P>, P> Double evaluate(
         M model, BCEvalParams evalParams
-    );
+    ) throws BallisticException;
 }

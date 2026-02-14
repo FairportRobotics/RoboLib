@@ -2,6 +2,7 @@ package org.fairportrobotics.frc.robolib.trajectory.ballistics.calculators;
 
 import org.fairportrobotics.frc.robolib.trajectory.Velocity3d;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.constraints.BCEvalParams;
+import org.fairportrobotics.frc.robolib.trajectory.ballistics.exceptions.BallisticException;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.models.BallisticModel;
 
 import edu.wpi.first.units.measure.Angle;
@@ -18,7 +19,7 @@ public class HillDescentBallisticCalculator extends BallisticCalculator {
         Velocity3d  robotVelocity,
         Angle       robotAngle,
         Velocity3d  shooterVelocity
-    ) {
+    ) throws BallisticException {
         Velocity3d candidateVelocity    = model.getCandidateVelocity(modelParam);
         BCEvalParams evalParams         = new BCEvalParams(robotVelocity, robotAngle, shooterVelocity, candidateVelocity);
         return new BCResult(this.evaluateCandidate(model, evalParams), evalParams);
@@ -30,7 +31,7 @@ public class HillDescentBallisticCalculator extends BallisticCalculator {
         Velocity3d  robotVelocity,
         Angle       robotAngle,
         Velocity3d  shooterVelocity
-    ) {
+    ) throws BallisticException {
         model.paramComputedReset();
 
         P           bestParam           = initParam;

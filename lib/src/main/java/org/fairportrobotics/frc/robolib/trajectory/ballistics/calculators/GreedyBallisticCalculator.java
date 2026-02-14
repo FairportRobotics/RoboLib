@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import org.fairportrobotics.frc.robolib.trajectory.Velocity3d;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.constraints.BCEvalParams;
+import org.fairportrobotics.frc.robolib.trajectory.ballistics.exceptions.BallisticException;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.models.BallisticModel;
 
 import edu.wpi.first.units.measure.Angle;
@@ -21,7 +22,7 @@ public class GreedyBallisticCalculator extends BallisticCalculator {
         Velocity3d  robotVelocity,
         Angle       robotAngle,
         Velocity3d  shooterVelocity
-    ) {
+    ) throws BallisticException {
         model.paramComputedReset();
 
         LinkedList<P> candidate_params = new LinkedList<>();
