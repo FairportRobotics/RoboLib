@@ -14,8 +14,7 @@ import edu.wpi.first.units.measure.Time;
 
 
 public class ParabolicTimeOfFlightBM extends ReversableRadialBM<Time> {
-
-    private final LinearAcceleration k_gravity = Units.MetersPerSecondPerSecond.of(-9.81);
+    public static final LinearAcceleration k_gravity = Units.MetersPerSecondPerSecond.of(-9.81);
 
     protected final Time tofMin;
     protected final Time tofMax;
@@ -54,20 +53,41 @@ public class ParabolicTimeOfFlightBM extends ReversableRadialBM<Time> {
         this.computedSeconds = new HashSet<>();
     }
 
+    //
+    //  Base getters
+    //
 
-    public Time getInitParam() {
-        return this.tofMin.plus(this.tofMax).div(2);
+    public Time getTOFMin() {
+        return this.tofMin;
+    }
+
+    public Time getTOFMax() {
+        return this.tofMax;
+    }
+
+    public Time getTOFStep() {
+        return this.tofStep;
+    }
+
+    public Translation3d getTargetPosRelative() {
+        return this.targetPosRelative;
+    }
+
+    public Distance getRelativeHorizontalDistance() {
+        return this.relativeHorizontalDistance;
+    }
+
+    public Angle getAzimuth() {
+        return this.azimuth;
     }
 
 
-    public Velocity3d getCandidateVelocity(Time param) {
-        this.computedSeconds.add(param.in(Units.Seconds));
-        return new Velocity3d(
-            this.relativeHorizontalDistance.div(param),
-            this.targetPosRelative.getMeasureZ().div(param)
-                .plus(k_gravity.times(param).times(0.5)),
-            azimuth
-        );
+    //
+    //  Parameter manipulation
+    //
+
+    public Time getInitParam() {
+        return this.tofMin.plus(this.tofMax).div(2);
     }
 
 
@@ -84,6 +104,21 @@ public class ParabolicTimeOfFlightBM extends ReversableRadialBM<Time> {
     }
 
 
+    //
+    //  Velocity modelling
+    //
+
+    public Velocity3d getCandidateVelocity(Time param) {
+        this.computedSeconds.add(param.in(Units.Seconds));
+        return new Velocity3d(
+            this.relativeHorizontalDistance.div(param),
+            this.targetPosRelative.getMeasureZ().div(param)
+                .minus(k_gravity.times(param).times(0.5)),
+            azimuth
+        );
+    }
+
+
     public Translation3d positionAtTime(Velocity3d velocity, Time time) {
         return new Translation3d(
             this.posLaunch.getMeasureX()
@@ -97,10 +132,18 @@ public class ParabolicTimeOfFlightBM extends ReversableRadialBM<Time> {
     }
 
 
+    //
+    //  Reverse functions
+    //
+
     public Time getTimeAtRadius(Velocity3d candidate, Distance radialDistance) {
         return radialDistance.div(candidate.getHorizontalVelocity());
     }
 
+
+    //
+    //  Computed parameter check
+    //
 
     public boolean paramComputed(Time param) {
         return this.computedSeconds.contains(param.in(Units.Seconds));

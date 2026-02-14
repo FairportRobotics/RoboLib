@@ -14,19 +14,27 @@ public abstract class BallisticModel<P> {
         this.posTarget      = posTarget;
     }
 
+    //
+    //  Base getters
+    //
+
+    public Translation3d getPosLaunch() {
+        return this.posLaunch;
+    }
+
+    public Translation3d getPosTarget() {
+        return this.posTarget;
+    }
+
+    //
+    //  Parameter Manipulation
+    //
+
     /**
      * @return Returns a recommended starting parameter
      */
     public abstract P getInitParam();
 
-    /**
-     * Get an abstract velocity (in the same coordinate space as posLaunch and
-     * posTarget) which will pass thru
-     *
-     * @param param The parameters used to determine this candidate
-     * @return The computed result for the given parameter
-     */
-    public abstract Velocity3d getCandidateVelocity(P param);
 
     /**
      * Get parameters that are "adjacent" to the input paramter (i.e. generate
@@ -37,14 +45,35 @@ public abstract class BallisticModel<P> {
      */
     public abstract P[] getNeighborParams(P param);
 
+
+    //
+    //  Velocity modelling
+    //
+
     /**
-     * Get the position of the projectile at a given time offset
+     * Get an initial velocity (in the same coordinate space as posLaunch and
+     * posTarget) which will pass thru posLaunch and posTarget with the given
+     * model configurations and parameters
+     *
+     * @param param The parameters used to determine this candidate
+     * @return The computed result for the given parameter
+     */
+    public abstract Velocity3d getCandidateVelocity(P param);
+
+
+    /**
+     * Get the position of the projectile at a given time offset for a given
+     * starting velocity
      *
      * @param velocity The velocity to check
      * @param time The time to check
      * @return The expected position at the given time
      */
     public abstract Translation3d positionAtTime(Velocity3d velocity, Time time);
+
+    //
+    //  Computed parameter check
+    //
 
     /**
      * Check if a given parameter has had a computed velocity

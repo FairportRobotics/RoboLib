@@ -16,6 +16,11 @@ public abstract class ReversableRadialBM<P> extends BallisticModel<P> {
         super(posLaunch, posTarget);
     }
 
+
+    //
+    //  Reverse functions
+    //
+
     /**
      * Get the time taken to travel a given radial distance from posLaunch towards posTarget
      *
@@ -36,7 +41,8 @@ public abstract class ReversableRadialBM<P> extends BallisticModel<P> {
      */
     public Time getTimeAtX(Velocity3d candidate, Distance xDistance) {
         Distance radialDistance = Units.Meters.of(
-            xDistance.in(Units.Meters)/Math.cos(candidate.getAzimuthAngle().in(Units.Radians))
+            xDistance.minus(posLaunch.getMeasureX()).in(Units.Meters)
+                / Math.cos(candidate.getAzimuthAngle().in(Units.Radians))
         );
         return this.getTimeAtRadius(candidate, radialDistance);
     }
@@ -52,10 +58,12 @@ public abstract class ReversableRadialBM<P> extends BallisticModel<P> {
      */
     public Time getTimeAtY(Velocity3d candidate, Distance yDistance) {
         Distance radialDistance = Units.Meters.of(
-            yDistance.in(Units.Meters)/Math.sin(candidate.getAzimuthAngle().in(Units.Radians))
+            yDistance.minus(posLaunch.getMeasureY()).in(Units.Meters)
+                / Math.sin(candidate.getAzimuthAngle().in(Units.Radians))
         );
         return this.getTimeAtRadius(candidate, radialDistance);
     }
+
 
     /**
      * Get the time to target on a given candidate trajectory
