@@ -5,6 +5,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.LinearVelocity;
 
 public class Velocity3d {
+    public static final Velocity3d zero = new Velocity3d(0.0, 0.0, 0.0);
+
     private final LinearVelocity xVelocity;
     private final LinearVelocity yVelocity;
     private final LinearVelocity zVelocity;
