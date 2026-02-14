@@ -1,15 +1,13 @@
 package org.fairportrobotics.frc.robolib.trajectory;
 
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Time;
 
 public class Velocity3d {
-    private final LinearVelocity vX;
-    private final LinearVelocity vY;
-    private final LinearVelocity vZ;
+    private final LinearVelocity xVelocity;
+    private final LinearVelocity yVelocity;
+    private final LinearVelocity zVelocity;
 
     private Double          cache_squareMagnitudeVelocity;
     private LinearVelocity  cache_magnitudeVelocity;
@@ -17,10 +15,10 @@ public class Velocity3d {
     private Angle           cache_azimuthAngle;
     private LinearVelocity  cache_horizontalVelocity;
 
-    public Velocity3d(LinearVelocity vX, LinearVelocity vY, LinearVelocity vZ) {
-        this.vX = vX.copy();
-        this.vY = vY.copy();
-        this.vZ = vZ.copy();
+    public Velocity3d(LinearVelocity xVelocity, LinearVelocity yVelocity, LinearVelocity zVelocity) {
+        this.xVelocity = xVelocity.copy();
+        this.yVelocity = yVelocity.copy();
+        this.zVelocity = zVelocity.copy();
 
         this.cache_squareMagnitudeVelocity  = null;
         this.cache_magnitudeVelocity        = null;
@@ -69,7 +67,7 @@ public class Velocity3d {
      * @return  The x-axis component of the velocity
      */
     public LinearVelocity getXVelocity() {
-        return vX;
+        return xVelocity;
     }
 
 
@@ -77,7 +75,7 @@ public class Velocity3d {
      * @return  The y-axis component of the velocity
      */
     public LinearVelocity getYVelocity() {
-        return vY;
+        return yVelocity;
     }
 
 
@@ -85,7 +83,7 @@ public class Velocity3d {
      * @return  The z-axis component of the velocity
      */
     public LinearVelocity getZVelocity() {
-        return vZ;
+        return zVelocity;
     }
 
 
@@ -94,9 +92,9 @@ public class Velocity3d {
      */
     public double getSquareMagnitude() {
         if(this.cache_squareMagnitudeVelocity == null) {
-            double vX_mps = this.vX.in(Units.MetersPerSecond);
-            double vY_mps = this.vY.in(Units.MetersPerSecond);
-            double vZ_mps = this.vZ.in(Units.MetersPerSecond);
+            double vX_mps = this.xVelocity.in(Units.MetersPerSecond);
+            double vY_mps = this.yVelocity.in(Units.MetersPerSecond);
+            double vZ_mps = this.zVelocity.in(Units.MetersPerSecond);
             this.cache_squareMagnitudeVelocity =    Math.pow(vX_mps, 2) +
                                                     Math.pow(vY_mps, 2) +
                                                     Math.pow(vZ_mps, 2);
@@ -178,7 +176,7 @@ public class Velocity3d {
      * @return The elevation angle of the velocity, with respect to the horizontal (XY) components
      * of the velocity.
      */
-    public Angle getElevation() {
+    public Angle getElevationAngle() {
         if(this.cache_eleveationAngle == null) {
             double vZ_mps       = this.getZVelocity().in(Units.MetersPerSecond);
             double vHori_mps    = this.getHorizontalVelocity().in(Units.MetersPerSecond);
@@ -207,9 +205,9 @@ public class Velocity3d {
      */
     public Velocity3d minus(Velocity3d other) {
         return new Velocity3d(
-            this.vX.minus(other.vX),
-            this.vY.minus(other.vY),
-            this.vZ.minus(other.vZ)
+            this.xVelocity.minus(other.xVelocity),
+            this.yVelocity.minus(other.yVelocity),
+            this.zVelocity.minus(other.zVelocity)
         );
     }
 
@@ -227,33 +225,19 @@ public class Velocity3d {
     }
 
 
-    /**
-     * Multiply the velocity by time in order to get a displacement
-     * @param time The time to compute over
-     * @return The resulting displacement
-     */
-    public Translation3d times(Time time) {
-        return new Translation3d(
-            this.vX.times(time),
-            this.vY.times(time),
-            this.vZ.times(time)
-        );
-    }
-
-
     //
     //  Overrides
     //
 
     @Override
     public int hashCode() {
-        return this.vX.hashCode() ^ this.vY.hashCode() ^ this.vZ.hashCode();
+        return this.xVelocity.hashCode() ^ this.yVelocity.hashCode() ^ this.zVelocity.hashCode();
     }
 
 
     @Override
     public String toString() {
-        return String.format("Velocity3d(X: %s, Y: %s, Z: %s)", vX, vY, vZ);
+        return String.format("Velocity3d(X: %s, Y: %s, Z: %s)", xVelocity, yVelocity, zVelocity);
     }
 
 
@@ -262,9 +246,9 @@ public class Velocity3d {
         if(Velocity3d.class.isInstance(obj)) {
             Velocity3d otherVelocity = (Velocity3d) obj;
             return
-                this.vX == otherVelocity.getXVelocity() &&
-                this.vY == otherVelocity.getYVelocity() &&
-                this.vZ == otherVelocity.getZVelocity();
+                this.xVelocity.equals(otherVelocity.getXVelocity()) &&
+                this.yVelocity.equals(otherVelocity.getYVelocity()) &&
+                this.zVelocity.equals(otherVelocity.getZVelocity());
         }
         return false;
     }
