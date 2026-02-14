@@ -12,10 +12,10 @@ import edu.wpi.first.units.measure.Time;
  * each radial position corresponds to exactly one time (e.g. a simple parabolic trajectory)
  */
 public abstract class ReversableRadialBM<P> extends BallisticModel<P> {
+
     public ReversableRadialBM(Translation3d posLaunch, Translation3d posTarget) {
         super(posLaunch, posTarget);
     }
-
 
     //
     //  Reverse functions
@@ -32,44 +32,78 @@ public abstract class ReversableRadialBM<P> extends BallisticModel<P> {
 
 
     /**
-     * Get the time taken to travel a given X distance (relative to posLaunch) on a given candidate
-     * trajectory
+     * Core function converting linear position (relative to posLaunch) to time
+     * using this.getTimeAtRadius
      *
-     * @param candidate The generated velocity to compute against
-     * @param xDistance The X distance relative to posLaunch to solve for
-     * @return The time it takes to travel a given X distance relative to posTarget
+     * @param candidate The candidate velocity to compute for
+     * @param distance Horizontal position (relative to posLaunch) to test for
+     * @param isXAxis If true, evaluate for the X axis
+     * @return The time to the given position
+     */
+    private Time getTimeAtHoriAxis(Velocity3d candidate, Distance distance, boolean isXAxis) {
+        double azimuthRadians = candidate.getAzimuthAngle().in(Units.Radians);
+        Distance radialDistance = Units.Meters.of(
+            distance.in(Units.Meters) / ((isXAxis) ? Math.cos(azimuthRadians) : Math.sin(azimuthRadians))
+        );
+        return this.getTimeAtRadius(candidate, radialDistance);
+    }
+
+
+    /**
+     * Get the time taken to reach a given X position (relative to posLaunch)
+     * for a given launch velocity
+     * 
+     * @param candidate The launch velocity
+     * @param xDistance The X position (relative to posLaunch)
+     * @return The time to the given position
+     */
+    public Time getTimeAtXRelative(Velocity3d candidate, Distance xDistance) {
+        return getTimeAtHoriAxis(candidate, xDistance, true);
+    }
+
+    /**
+     * Get the time taken to reach a given Y position (relative to posLaunch)
+     * for a given launch velocity
+     *
+     * @param candidate The launch velocity
+     * @param yDistance The Y position (relative to posLaunch)
+     * @return The time to the given position
+     */
+    public Time getTimeAtYRelative(Velocity3d candidate, Distance yDistance) {
+        return getTimeAtHoriAxis(candidate, yDistance, false);
+    }
+
+    /**
+     * Get the time taken to reach a given X position (relative to the field)
+     * for a given launch velocity
+     *
+     * @param candidate The launch velocity
+     * @param xDistance The X position (relative to the field)
+     * @return The time to the given position
      */
     public Time getTimeAtX(Velocity3d candidate, Distance xDistance) {
-        Distance radialDistance = Units.Meters.of(
-            xDistance.minus(posLaunch.getMeasureX()).in(Units.Meters)
-                / Math.cos(candidate.getAzimuthAngle().in(Units.Radians))
-        );
-        return this.getTimeAtRadius(candidate, radialDistance);
+        return getTimeAtXRelative(candidate, xDistance.minus(posLaunch.getMeasureX()));
     }
 
 
     /**
-     * Get the time taken to travel a given Y distance (relative to posLaunch) on a given candidate
-     * trajectory
+     * Get the time taken to reach a given Y position (relative to the field)
+     * for a given launch velocity
      *
-     * @param candidate The generated velocity to compute against
-     * @param yDistance The Y distance relative to posLaunch to solve for
-     * @return The time it takes to travel a given Y distance relative to posTarget
+     * @param candidate The launch velocity
+     * @param yDistance The Y position (relative to the field)
+     * @return The time to the given position
      */
     public Time getTimeAtY(Velocity3d candidate, Distance yDistance) {
-        Distance radialDistance = Units.Meters.of(
-            yDistance.minus(posLaunch.getMeasureY()).in(Units.Meters)
-                / Math.sin(candidate.getAzimuthAngle().in(Units.Radians))
-        );
-        return this.getTimeAtRadius(candidate, radialDistance);
+        return getTimeAtYRelative(candidate, yDistance.minus(posLaunch.getMeasureY()));
     }
 
 
     /**
-     * Get the time to target on a given candidate trajectory
+     * Get the time to target on a given launch velocity
      * 
-     * @param candidate The generated velocity to compute against
-     * @return The time it takes to travel to the target position
+     * @param candidate The launch velocity
+     * @return The time to target
      */
     public Time getTimeAtTarget(Velocity3d candidate) {
         return this.getTimeAtX(candidate, posTarget.getMeasureX());

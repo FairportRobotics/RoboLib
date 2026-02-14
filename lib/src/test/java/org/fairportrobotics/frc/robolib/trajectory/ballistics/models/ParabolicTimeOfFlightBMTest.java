@@ -32,6 +32,7 @@ public class ParabolicTimeOfFlightBMTest {
         );
     }
 
+
     @Test void testSolutionVelocity() {
         ParabolicTimeOfFlightBM model = getModel();
         Time tof = Units.Seconds.of(1.0);
@@ -83,20 +84,26 @@ public class ParabolicTimeOfFlightBMTest {
         // Test initial position
         Time t0 = Units.Seconds.of(0.0);
         assertEquals(t0, model.getTimeAtRadius(solution, Units.Meters.of(0.0)), "Init Position (Rad)");
-        assertEquals(t0, model.getTimeAtX(solution, model.getPosLaunch().getMeasureX()), "Init Position (X)");
-        assertEquals(t0, model.getTimeAtY(solution, model.getPosLaunch().getMeasureY()), "Init Position (Y)");
+        assertEquals(t0, model.getTimeAtX(solution, model.getPosLaunch().getMeasureX()), "Init Position (X, abs)");
+        assertEquals(t0, model.getTimeAtY(solution, model.getPosLaunch().getMeasureY()), "Init Position (Y, abs)");
+        assertEquals(t0, model.getTimeAtXRelative(solution, Units.Meters.of(0.0)), "Init Position (X, rel)");
+        assertEquals(t0, model.getTimeAtYRelative(solution, Units.Meters.of(0.0)), "Init Position (Y, rel)");
 
         // Test target position
         assertEquals(tof, model.getTimeAtRadius(solution, model.getRelativeHorizontalDistance()), "Final Position (Rad)");
-        assertEquals(tof, model.getTimeAtX(solution, model.getPosTarget().getMeasureX()), "Final Position (X)");
-        assertEquals(tof, model.getTimeAtY(solution, model.getPosTarget().getMeasureY()), "Final Position (Y)");
+        assertEquals(tof, model.getTimeAtX(solution, model.getPosTarget().getMeasureX()), "Final Position (X, Abs)");
+        assertEquals(tof, model.getTimeAtY(solution, model.getPosTarget().getMeasureY()), "Final Position (Y, Abs)");
+        assertEquals(tof, model.getTimeAtXRelative(solution, model.getTargetPosRelative().getMeasureX()), "Final Position (X, Rel)");
+        assertEquals(tof, model.getTimeAtYRelative(solution, model.getTargetPosRelative().getMeasureY()), "Final Position (Y, Rel)");
         assertEquals(tof, model.getTimeAtTarget(solution));
 
         // Test mid-flight position
         Time tMid = Units.Seconds.of(0.5);
-        assertEquals(tMid, model.getTimeAtRadius(solution, model.getRelativeHorizontalDistance().div(2)));
-        assertEquals(tMid, model.getTimeAtX(solution, Units.Meters.of(2.5)));
-        assertEquals(tMid, model.getTimeAtY(solution, Units.Meters.of(3.0)));
+        assertEquals(tMid, model.getTimeAtRadius(solution, model.getRelativeHorizontalDistance().div(2)), "Mid Position (Rad)");
+        assertEquals(tMid, model.getTimeAtX(solution, Units.Meters.of(2.5)), "Mid Position (X, Abs)");
+        assertEquals(tMid, model.getTimeAtY(solution, Units.Meters.of(3.0)), "Mid Position (Y, Abs)");
+        assertEquals(tMid, model.getTimeAtXRelative(solution, Units.Meters.of(1.5)), "Mid Position (X, REL)");
+        assertEquals(tMid, model.getTimeAtYRelative(solution, Units.Meters.of(2.0)), "Mid Position (Y, REL)");
     }
 
     @Test void testCandidateTracking() {
