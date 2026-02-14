@@ -74,4 +74,5 @@ public abstract class ReversableRadialBM<P> extends BallisticModel<P> {
     public Time getTimeAtTarget(Velocity3d candidate) {
         return this.getTimeAtX(candidate, posTarget.getMeasureX());
     }
+
 }

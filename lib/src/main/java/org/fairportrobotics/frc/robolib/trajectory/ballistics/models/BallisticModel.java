@@ -3,15 +3,26 @@ package org.fairportrobotics.frc.robolib.trajectory.ballistics.models;
 import org.fairportrobotics.frc.robolib.trajectory.Velocity3d;
 
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 
 public abstract class BallisticModel<P> {
     protected Translation3d posLaunch;
     protected Translation3d posTarget;
 
+    protected final Translation3d targetPosRelative;
+    protected final Distance relativeHorizontalDistance;
+
     public BallisticModel(Translation3d posLaunch, Translation3d posTarget) {
         this.posLaunch      = posLaunch;
         this.posTarget      = posTarget;
+
+        this.targetPosRelative = this.posTarget.minus(this.posLaunch);
+        this.relativeHorizontalDistance = Units.Meters.of(Math.hypot(
+            this.targetPosRelative.getMeasureX().in(Units.Meters),
+            this.targetPosRelative.getMeasureY().in(Units.Meters)
+        ));
     }
 
     //
@@ -24,6 +35,14 @@ public abstract class BallisticModel<P> {
 
     public Translation3d getPosTarget() {
         return this.posTarget;
+    }
+
+    public Translation3d getTargetPosRelative() {
+        return this.targetPosRelative;
+    }
+
+    public Distance getRelativeHorizontalDistance() {
+        return this.relativeHorizontalDistance;
     }
 
     //

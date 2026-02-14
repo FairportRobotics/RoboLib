@@ -20,8 +20,6 @@ public class ParabolicTimeOfFlightBM extends ReversableRadialBM<Time> {
     protected final Time tofMax;
     protected final Time tofStep;
 
-    protected final Translation3d   targetPosRelative;
-    protected final Distance        relativeHorizontalDistance;
     protected final Angle           azimuth;
 
     private HashSet<Double>         computedSeconds;
@@ -38,13 +36,6 @@ public class ParabolicTimeOfFlightBM extends ReversableRadialBM<Time> {
         this.tofStep    = tofStep;
 
         // Pre-compute components
-        this.targetPosRelative = this.posTarget.minus(this.posLaunch);
-        this.relativeHorizontalDistance = Units.Meters.of(
-            Math.hypot(
-                this.targetPosRelative.getMeasureX().in(Units.Meters),
-                this.targetPosRelative.getMeasureY().in(Units.Meters)
-            )
-        );
         this.azimuth = Units.Radians.of(
             Math.atan2(targetPosRelative.getY(), targetPosRelative.getX()
         ));
@@ -61,21 +52,16 @@ public class ParabolicTimeOfFlightBM extends ReversableRadialBM<Time> {
         return this.tofMin;
     }
 
+
     public Time getTOFMax() {
         return this.tofMax;
     }
+
 
     public Time getTOFStep() {
         return this.tofStep;
     }
 
-    public Translation3d getTargetPosRelative() {
-        return this.targetPosRelative;
-    }
-
-    public Distance getRelativeHorizontalDistance() {
-        return this.relativeHorizontalDistance;
-    }
 
     public Angle getAzimuth() {
         return this.azimuth;
