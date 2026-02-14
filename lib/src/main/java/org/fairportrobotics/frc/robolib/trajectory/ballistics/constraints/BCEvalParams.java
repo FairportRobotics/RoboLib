@@ -26,7 +26,7 @@ public class BCEvalParams {
 
     //
     // Setup
-    //
+    //)
 
     public BCEvalParams(
         Velocity3d robotVelocity,
@@ -34,13 +34,13 @@ public class BCEvalParams {
         Velocity3d currentShooterVelocity,
         Velocity3d candidateVelocity
     ) {
-        this.robotVelocity          = robotVelocity;
-        this.robotAngle             = robotAngle;
-        this.currentShooterVelocity = currentShooterVelocity;
+        this.robotVelocity                          = robotVelocity;
+        this.robotAngle                             = robotAngle;
+        this.currentShooterVelocity                 = currentShooterVelocity;
 
-        this.candidateVelocity      = candidateVelocity;
+        this.candidateVelocity                      = candidateVelocity;
 
-        this.cache_candidateShooterVelocity   = null;
+        this.cache_candidateShooterVelocity         = null;
         this.cache_candidateShooterVelocityRelative = null;
     }
 
@@ -107,6 +107,18 @@ public class BCEvalParams {
                 this.getCandidateShooterVelocity().rotate(this.robotAngle.times(-1));
         }
         return this.cache_candidateShooterVelocityRelative;
+    }
+
+    public boolean equals(BCEvalParams other) {
+        return
+            this.robotVelocity.equals(other.getRobotVelocity()) &&
+            this.robotAngle.equals(other.getRobotAngle()) &&
+            this.currentShooterVelocity.equals(other.getCurrentShooterVelocity()) &&
+            this.candidateVelocity.equals(other.candidateVelocity);
+    }
+
+    public boolean equals(Object other) {
+        return false;
     }
 
 }
