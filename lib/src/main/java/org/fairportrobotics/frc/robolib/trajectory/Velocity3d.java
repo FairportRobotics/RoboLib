@@ -49,6 +49,13 @@ public class Velocity3d {
         this.cache_horizontalVelocity   = horizontalVelocity.copy();
     }
 
+    public static Velocity3d genSpherical(double radialVelocityMPS, double elevationAngleDeg, double azimuthAngleDeg) {
+        return new Velocity3d(
+            Units.MetersPerSecond.of(radialVelocityMPS),
+            Units.Degrees.of(elevationAngleDeg),
+            Units.Degrees.of(azimuthAngleDeg)
+        );
+    }
 
     public Velocity3d(LinearVelocity radialVelocity, Angle elevationAngle, Angle azimuthAngle) {
         this(
@@ -191,7 +198,7 @@ public class Velocity3d {
     /**
      * @return The radial component of the spherical velocity (alias of this.getMagnitude())
      */
-    public LinearVelocity getSphericalVelocity() {
+    public LinearVelocity getSpeed() {
         return this.getMagnitude();
     }
 
@@ -199,6 +206,14 @@ public class Velocity3d {
     //
     // Transforms and Conversions
     //
+
+    public Velocity3d plus(Velocity3d other) {
+        return new Velocity3d(
+            this.xVelocity.plus(other.xVelocity),
+            this.yVelocity.plus(other.yVelocity),
+            this.zVelocity.plus(other.zVelocity)
+        );
+    }
 
     /**
      * Subtract other from this vector and return the resulting vector
@@ -242,6 +257,12 @@ public class Velocity3d {
         return String.format("Velocity3d(X: %s, Y: %s, Z: %s)", xVelocity, yVelocity, zVelocity);
     }
 
+    public String toStringSpherical() {
+        return String.format(
+            "Velocity3d(Speed: %s, Elevation: %s, Azimuth: %s)",
+            this.getSpeed(), this.getElevationAngle(), this.getAzimuthAngle()
+        );
+    }
 
     @Override
     public boolean equals(Object obj) {

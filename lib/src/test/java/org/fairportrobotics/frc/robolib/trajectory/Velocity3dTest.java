@@ -27,7 +27,7 @@ public class Velocity3dTest {
 
         // Check spherical
         assertEquals(45, test.getElevationAngle().in(Units.Degrees), epsilon, "Elevation");
-        assertEquals(Math.sqrt(2.0), test.getSphericalVelocity().in(Units.MetersPerSecond), epsilon, "Magnitude");
+        assertEquals(Math.sqrt(2.0), test.getSpeed().in(Units.MetersPerSecond), epsilon, "Magnitude");
 
     }
 
@@ -58,11 +58,17 @@ public class Velocity3dTest {
     }
 
     @Test void testSphericalConstructor() {
-        testConstructorBase(new Velocity3d(
+        Velocity3d test = new Velocity3d(
             Units.MetersPerSecond.of(Math.sqrt(2)),
             Units.Degrees.of(45),
             Units.Degrees.of(45)
-        ));
+        );
+        testConstructorBase(test);
+        assertEquals(
+            test,
+            Velocity3d.genSpherical(Math.sqrt(2), 45, 45),
+            "genSpherical Test"
+        );
     }
 
     //
@@ -78,6 +84,15 @@ public class Velocity3dTest {
     //
     //  Test transforms
     //
+
+    @Test void testPlus() {
+        assertEquals(
+            new Velocity3d(5.0, 6.0, 7.0),
+            new Velocity3d(4.0, 5.0, 6.0).plus(
+                new Velocity3d(1.0, 1.0, 1.0)
+            )
+        );
+    }
 
     @Test void testMinus() {
         Velocity3d test = new Velocity3d(1.0, 1.0, 1.0).minus(
