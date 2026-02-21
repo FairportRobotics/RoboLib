@@ -29,6 +29,54 @@ public class BCEvalParams {
     //  Setup
     //
 
+    public static BCEvalParams genSetShooterVelocity(
+        Velocity3d  candidateShooterVelocity
+    ) {
+        return genSetShooterVelocity(
+            Velocity3d.zero, Units.Degrees.zero(), Velocity3d.zero,
+            candidateShooterVelocity
+        );
+    }
+
+    public static BCEvalParams genSetShooterVelocity(
+        Velocity3d  robotVelocity,
+        Angle       robotAngle,
+        Velocity3d  currentShooterVelocity,
+        Velocity3d  candidateShooterVelocity
+    ) {
+        return new BCEvalParams(
+            robotVelocity,
+            robotAngle,
+            currentShooterVelocity,
+            candidateShooterVelocity.plus(robotVelocity)
+        );
+
+    }
+
+    public static BCEvalParams genSetShooterRelativeVelocity(
+        Velocity3d candidateShooterVelocityRelative
+    ) {
+        return genSetShooterRelativeVelocity(
+            Velocity3d.zero, Units.Degrees.zero(), Velocity3d.zero,
+            candidateShooterVelocityRelative
+        );
+    }
+
+    public static BCEvalParams genSetShooterRelativeVelocity(
+        Velocity3d robotVelocity,
+        Angle robotAngle,
+        Velocity3d currentShooterVelocity,
+        Velocity3d candidateShooterVelocityRelative
+    ) {
+        BCEvalParams toRet = genSetShooterVelocity(
+            robotVelocity,
+            robotAngle,
+            currentShooterVelocity,
+            candidateShooterVelocityRelative.rotate(robotAngle)
+        );
+        return toRet;
+    }
+
     public BCEvalParams(
         Velocity3d robotVelocity,
         Angle      robotAngle,

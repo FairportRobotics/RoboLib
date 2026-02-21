@@ -43,4 +43,20 @@ public class BCEvalParamsTest {
             "Robot Velocity and Angle"
         );
     }
+
+    @Test void testGenSetShooterVelocity() {
+        Velocity3d shooterVelocity = Velocity3d.genSpherical(2.0, -135.0, 0.0);
+        assertEquals(
+            shooterVelocity,
+            BCEvalParams.genSetShooterVelocity(shooterVelocity).getCandidateShooterVelocity()
+        );
+    }
+
+    @Test void testGenSetShooterRelativeVelocity() {
+        Velocity3d shooterRelativeVelocity = Velocity3d.genSpherical(2.0, -135.0, 0.0);
+        assertEquals(
+            shooterRelativeVelocity,
+            BCEvalParams.genSetShooterRelativeVelocity(shooterRelativeVelocity).getCandidateShooterVelocityRelative()
+        );
+    }
 }
