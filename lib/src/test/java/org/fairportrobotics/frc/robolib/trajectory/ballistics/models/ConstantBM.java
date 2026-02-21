@@ -10,12 +10,13 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 
 public class ConstantBM extends ReversableRadialBM<Integer> {
-    private Velocity3d velocityResult;
+    private Velocity3d    velocityResult;
     private Translation3d positionResult;
-    private Time revResult;
-    private int initParam;
-    private int minParam;
-    private int maxParam;
+    private Time          revResult;
+
+    private int           initParam;
+    private int           minParam;
+    private int           maxParam;
 
     private HashSet<Integer> computedParams;
 
@@ -23,6 +24,10 @@ public class ConstantBM extends ReversableRadialBM<Integer> {
     //
     //  Setup code
     //
+
+    public ConstantBM() {
+        this(Translation3d.kZero, Translation3d.kZero);
+    }
 
     public ConstantBM(
         Translation3d posLaunch,
