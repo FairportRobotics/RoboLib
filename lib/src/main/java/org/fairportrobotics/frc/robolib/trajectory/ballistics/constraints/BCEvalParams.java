@@ -2,6 +2,7 @@ package org.fairportrobotics.frc.robolib.trajectory.ballistics.constraints;
 
 import org.fairportrobotics.frc.robolib.trajectory.Velocity3d;
 
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 
 /**
@@ -25,8 +26,8 @@ public class BCEvalParams {
     private Velocity3d cache_candidateShooterVelocityRelative;
 
     //
-    // Setup
-    //)
+    //  Setup
+    //
 
     public BCEvalParams(
         Velocity3d robotVelocity,
@@ -107,6 +108,23 @@ public class BCEvalParams {
                 this.getCandidateShooterVelocity().rotate(this.robotAngle.times(-1));
         }
         return this.cache_candidateShooterVelocityRelative;
+    }
+
+    public int hashCode() {
+        return  this.robotVelocity.hashCode() ^
+                Double.hashCode(this.robotAngle.in(Units.Degrees)) ^
+                this.currentShooterVelocity.hashCode() ^
+                this.candidateVelocity.hashCode();
+    }
+
+    public String toString() {
+        return String.format(
+            "BCEvalParams(robotVelocity: %s, robotAngle: %s, currentShooterVelocity: %s, candidateVelocity: %s)",
+            this.robotVelocity.toString(),
+            this.robotAngle.toString(),
+            this.currentShooterVelocity.toString(),
+            this.candidateVelocity.toString()
+        );
     }
 
     public boolean equals(BCEvalParams other) {
