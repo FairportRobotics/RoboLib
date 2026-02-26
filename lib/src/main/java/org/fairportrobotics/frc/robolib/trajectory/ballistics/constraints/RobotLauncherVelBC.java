@@ -104,7 +104,7 @@ public class RobotLauncherVelBC extends BallisticConstraint {
         try {
             velocityWeight = this.getPartialWeight(
                 minVelocityMPS, maxVelocityMPS, targetVelocityPercent,
-                evalParams.getCandidateShooterVelocityRelative().getSphericalVelocity().in(Units.MetersPerSecond)
+                evalParams.getCandidateShooterVelocityRelative().getSpeed().in(Units.MetersPerSecond)
             );
             azimuthWeight = this.getPartialWeight(
                 minAzimuthDegrees, maxAzimuthDegrees, targetAzimuthPercent,
