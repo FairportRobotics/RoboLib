@@ -44,7 +44,7 @@ public class HeightAtPositionBC extends BallisticConstraint {
     }
 
 
-    public <M extends ReversableRadialBM<P>, P> Double evaluate(
+    public <M extends ReversableRadialBM<?>> Double evaluate_reversable(
         M model, BCEvalParams evalParams
     ) throws UnhandledEnumException{
         Time timeAtTarget;
@@ -87,7 +87,10 @@ public class HeightAtPositionBC extends BallisticConstraint {
 
     public <M extends BallisticModel<P>, P> Double evaluate(
         M model, BCEvalParams evalParams
-    ) {
+    ) throws UnhandledEnumException {
+        if(model instanceof ReversableRadialBM) {
+            return this.evaluate_reversable((ReversableRadialBM<?>) model, evalParams);
+        }
         return null;
     }
 }
