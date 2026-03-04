@@ -3,7 +3,11 @@ package org.fairportrobotics.frc.robolib.trajectory.ballistics.constraints;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.exceptions.BallisticException;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.models.BallisticModel;
 
+/**
+ * Abstract base class for a ballistic constraints
+ */
 public abstract class BallisticConstraint {
+    /** The weight given to this constraint in the evaluation function */
     protected double weight;
 
     /**
@@ -15,6 +19,7 @@ public abstract class BallisticConstraint {
 
     /**
      * Generate the constraint with a given weight value
+     *
      * @param weight The weight of this constraint's penalty
      */
     public BallisticConstraint(double weight) {
@@ -32,6 +37,8 @@ public abstract class BallisticConstraint {
     }
 
     /**
+     * Get the weight of this constraint
+     *
      * @return The weight of this constraint
      */
     public double getWeight() {

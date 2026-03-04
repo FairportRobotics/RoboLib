@@ -15,11 +15,19 @@ import edu.wpi.first.units.measure.Time;
  */
 public class HeightAtPositionBC extends BallisticConstraint {
 
-    enum PositionType {
+    /**
+     * The types of position to evaluate forf
+     */
+    public enum PositionType {
+        /** Evaluate with the radial distance away from the target */
         TargetRadius,
+        /** Evaluate against an absolute X position */
         AbsoluteX,
+        /** Evaluate against an absolute Y position */
         AbsoluteY,
+        /** Evaluate against an X position relative to launch position */
         RelativeX,
+        /** Evaluate against a Y position relative to the launch position */
         RelativeY
     };
 
@@ -29,23 +37,33 @@ public class HeightAtPositionBC extends BallisticConstraint {
     private final PositionType positionType;
 
     /**
+     * Main constructor
+     *
      * @param minHeight The minimum passing height
      * @param safeHeight The height above which no penalty is applied
      * @param testPosition The position to test at
      * @param positionType The type of position check to run
      */
     public HeightAtPositionBC(
-        Distance minHeight, Distance safeHeight, Distance testRadius, PositionType positionType
+        Distance minHeight, Distance safeHeight, Distance testPosition, PositionType positionType
     ) {
         this.minHeightMeters    = minHeight.in(Units.Meters);
         this.safeHeightMeters   = safeHeight.in(Units.Meters);
-        this.testPosition       = testRadius;
+        this.testPosition       = testPosition;
         this.positionType       = positionType;
     }
 
 
-    public <M extends ReversableRadialBM<?>> Double evaluate_reversable(
-        M model, BCEvalParams evalParams
+    /**
+     * Evaluation function for a reversable, radial ballistic model
+     *
+     * @param model The model to evaluate against
+     * @param evalParams The params to evaluate
+     * @return The penalty percentage (from 0 to 1, inclusive). null for constraint failure
+     * @throws UnhandledEnumException If this.positionType is not valid
+     */
+    private Double evaluate_reversable(
+        ReversableRadialBM<?> model, BCEvalParams evalParams
     ) throws UnhandledEnumException{
         Time timeAtTarget;
         switch(this.positionType) {
@@ -84,7 +102,16 @@ public class HeightAtPositionBC extends BallisticConstraint {
         }
     }
 
-
+    /**
+     * General evaluation function
+     *
+     * @param <M> The type of model to evaluate for
+     * @param <P> The type of model parameter to evaluate for
+     * @param model The model parameter to evaluate for
+     * @param evalParams The params to evaluate
+     * @return The penalty percentage (from 0 to 1, inclusive). null for constraint failure
+     * @throws UnhandledEnumException If this.positionType is not valid
+     */
     public <M extends BallisticModel<P>, P> Double evaluate(
         M model, BCEvalParams evalParams
     ) throws UnhandledEnumException {
