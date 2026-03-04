@@ -4,8 +4,18 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.LinearVelocity;
 
+/**
+ * <p>A class defining a 3-dimensional velocity vector. Vector can be specified
+ * and queried in cartesian, cylindrical, and spherical coordinates, and may be
+ * transformed.</p>
+ * 
+ * <p>Velocity3d instances are immutable (i.e. they cannot be changed), are
+ * hashable (allowing them to be used in HashMap and HashSet), and provide
+ * equality checks.</p>
+ */
 public class Velocity3d {
-    public static final Velocity3d zero = new Velocity3d(0.0, 0.0, 0.0);
+    /** A Velocity3d instance with 0 velocity in all directions */
+    public static final Velocity3d kZero = new Velocity3d(0.0, 0.0, 0.0);
 
     private final LinearVelocity xVelocity;
     private final LinearVelocity yVelocity;
@@ -17,6 +27,13 @@ public class Velocity3d {
     private Angle           cache_azimuthAngle;
     private LinearVelocity  cache_horizontalVelocity;
 
+    /**
+     * Construct a velocity vector with cartesian coordinates
+     *
+     * @param xVelocity The velocity in the X dimension
+     * @param yVelocity The velocity in the Y dimension
+     * @param zVelocity The velocity in the vertical/Z dimension
+     */
     public Velocity3d(LinearVelocity xVelocity, LinearVelocity yVelocity, LinearVelocity zVelocity) {
         this.xVelocity = xVelocity.copy();
         this.yVelocity = yVelocity.copy();
@@ -30,15 +47,30 @@ public class Velocity3d {
     }
 
 
-    public Velocity3d(double vX, double vY, double vZ) {
+    /**
+     * Construct a velocity vector with cartesian coordinates
+     *
+     * @param xVelocityMPS The velocity in the X dimension (in meters per second)
+     * @param yVelocityMPS The velocity in the Y dimension (in meters per second)
+     * @param zVelocityMPS The velocity in the vertical/Z dimension (in meters per second)
+     */
+    public Velocity3d(double xVelocityMPS, double yVelocityMPS, double zVelocityMPS) {
         this(
-            Units.MetersPerSecond.of(vX),
-            Units.MetersPerSecond.of(vY),
-            Units.MetersPerSecond.of(vZ)
+            Units.MetersPerSecond.of(xVelocityMPS),
+            Units.MetersPerSecond.of(yVelocityMPS),
+            Units.MetersPerSecond.of(zVelocityMPS)
         );
     }
 
 
+    /**
+     * Construct a velocity in cylindrical coordinates (around the vertical axis).
+     *
+     * @param horizontalVelocity The velocity parallel to the ground
+     * @param verticalVelocity The vertical velocity
+     * @param azimuthAngle The angle of the velocity around the vertical axis,
+     * counterclockwise from +X
+     */
     public Velocity3d(LinearVelocity horizontalVelocity, LinearVelocity verticalVelocity, Angle azimuthAngle) {
         this(
             horizontalVelocity.times(Math.cos(azimuthAngle.in(Units.Radians))),
@@ -47,18 +79,37 @@ public class Velocity3d {
         );
     }
 
-    public static Velocity3d genSpherical(double radialVelocityMPS, double elevationAngleDeg, double azimuthAngleDeg) {
+    /**
+     * Construct a velocity vector in spherical coordinates
+     *
+     * @param speedMPS The magnitude of the vector (in meters per second)
+     * @param elevationAngleDeg The elevation angle of the vector (in degrees,
+     * angle above the horizontal plane)
+     * @param azimuthAngleDeg The angle of the vector around the vertical
+     * axis (in degrees), counterclockwise from +X
+     * @return The generated velocity vector
+     */
+    public static Velocity3d genSpherical(double speedMPS, double elevationAngleDeg, double azimuthAngleDeg) {
         return new Velocity3d(
-            Units.MetersPerSecond.of(radialVelocityMPS),
+            Units.MetersPerSecond.of(speedMPS),
             Units.Degrees.of(elevationAngleDeg),
             Units.Degrees.of(azimuthAngleDeg)
         );
     }
 
-    public Velocity3d(LinearVelocity radialVelocity, Angle elevationAngle, Angle azimuthAngle) {
+    /**
+     * Construct a velocity vector in spherical coordinates
+     *
+     * @param speed The magnitude of the vector
+     * @param elevationAngle The elevation angle of the vector (angle above the
+     * horizontal plane)
+     * @param azimuthAngle The angle of the vector around the vertical axis,
+     * counterclockwise from +X
+     */
+    public Velocity3d(LinearVelocity speed, Angle elevationAngle, Angle azimuthAngle) {
         this(
-            radialVelocity.times(Math.cos(elevationAngle.in(Units.Radians))),
-            radialVelocity.times(Math.sin(elevationAngle.in(Units.Radians))),
+            speed.times(Math.cos(elevationAngle.in(Units.Radians))),
+            speed.times(Math.sin(elevationAngle.in(Units.Radians))),
             azimuthAngle
         );
     }
@@ -69,6 +120,8 @@ public class Velocity3d {
     //
 
     /**
+     * Get the x-axis component of the velocity
+     *
      * @return  The x-axis component of the velocity
      */
     public LinearVelocity getXVelocity() {
@@ -77,6 +130,8 @@ public class Velocity3d {
 
 
     /**
+     * Get the y-axis component of the velocity
+     *
      * @return  The y-axis component of the velocity
      */
     public LinearVelocity getYVelocity() {
@@ -85,6 +140,8 @@ public class Velocity3d {
 
 
     /**
+     * Get the z-axis component of the velocity
+     *
      * @return  The z-axis component of the velocity
      */
     public LinearVelocity getZVelocity() {
@@ -93,6 +150,8 @@ public class Velocity3d {
 
 
     /**
+     * Returns the squared magnitude of the velocity vector in m^2s^-2
+     *
      * @return The squared magnitude of the velocity vector in m^2s^-2
      */
     public double getSquareMagnitude() {
@@ -108,6 +167,8 @@ public class Velocity3d {
     }
 
     /**
+     * Returns the magnitude/speed of the velocity vector
+     *
      * @return  The magnitude of the velocity vector
      */
     public LinearVelocity getMagnitude() {
@@ -119,12 +180,23 @@ public class Velocity3d {
         return this.cache_magnitudeVelocity;
     }
 
+    /**
+     * Alias of this.getMagnitude()
+     *
+     * @return The magnitude of the velocity vector
+     */
+    public LinearVelocity getSpeed() {
+        return this.getMagnitude();
+    }
+
 
     //
     //  Cylindrical Coordinate getters
     //
 
     /**
+     * Returns the vertical component of the velocity
+     *
      * @return  The magnitude of the vertical component of the velocity (alias of this.getVZ())
      */
     public LinearVelocity getVeritcalVelocity() {
@@ -133,7 +205,9 @@ public class Velocity3d {
 
 
     /**
-     * @return  The magnitude of the horizontal component of the velocity
+     * Returns the horizontal component of the velocity
+     *
+     * @return  The the horizontal component of the velocity
      */
     public LinearVelocity getHorizontalVelocity() {
         if (this.cache_horizontalVelocity == null) {
@@ -151,11 +225,12 @@ public class Velocity3d {
 
 
     /**
-     * Returns the azimuth angle of the robot with respect to +X (CCW positive)
+     * <p>Returns the azimuth angle of the robot (counterclockwise from +X).</p>
      * 
-     * Azimuth is the angle in the horizontal (XY) plane, around the vertical (Z) axis.
+     * <p>Azimuth is the angle in the horizontal (XY) plane around the vertical
+     * (Z) axis.</p>
      * 
-     * @return The azimuth angle of the velocity, with respect to your chosen X
+     * @return The azimuth angle of the velocity (from -180 to 180, inclusive)
      */
     public Angle getAzimuthAngle() {
         if (this.cache_azimuthAngle == null) {
@@ -173,13 +248,14 @@ public class Velocity3d {
 
 
     /**
-     * Returns the elevation angle of the robot with resepect to the horizontal plane
+     * <p>Returns the elevation angle of the robot with resepect to the
+     * horizontal plane</p>
      * 
-     * Elevation is the angle between the horizontal component of the velocity and the final
-     * velocity. By convention, upwards angles are positive
+     * <p>Elevation is the angle between the horizontal component of the
+     * velocity and the final velocity. By convention, upwards angles are
+     * positive.</p>
      *
-     * @return The elevation angle of the velocity, with respect to the horizontal (XY) components
-     * of the velocity.
+     * @return The elevation angle of the velocity (from -90 to 90, inclusive)
      */
     public Angle getElevationAngle() {
         if(this.cache_eleveationAngle == null) {
@@ -191,18 +267,16 @@ public class Velocity3d {
     }
 
 
-    /**
-     * @return The radial component of the spherical velocity (alias of this.getMagnitude())
-     */
-    public LinearVelocity getSpeed() {
-        return this.getMagnitude();
-    }
-
-
     //
     // Transforms and Conversions
     //
 
+    /**
+     * Add another vector to this one and return the result
+     *
+     * @param other The other vector to add to this one
+     * @return The sum of this vector and other
+     */
     public Velocity3d plus(Velocity3d other) {
         return new Velocity3d(
             this.xVelocity.plus(other.xVelocity),
@@ -212,7 +286,8 @@ public class Velocity3d {
     }
 
     /**
-     * Subtract other from this vector and return the resulting vector
+     * Subtract another vector from this one and return the result
+     *
      * @param other The vector to subtract from this one
      * @return The difference of this vector from other
      */
@@ -226,6 +301,7 @@ public class Velocity3d {
 
     /**
      * Rotate the vector by adding a given angle to the azimuth
+     *
      * @param rotAngle The angle to add to the azimuth
      * @return A new, rotated Velocity3d instance
      */
@@ -253,6 +329,11 @@ public class Velocity3d {
         return String.format("Velocity3d(X: %s, Y: %s, Z: %s)", xVelocity, yVelocity, zVelocity);
     }
 
+    /**
+     * Get the string representation of this vector in spherical coordinates
+     *
+     * @return The string representation of this vector in spherical coordinates
+     */
     public String toStringSpherical() {
         return String.format(
             "Velocity3d(Speed: %s m/s, Elevation: %s deg, Azimuth: %s deg)",

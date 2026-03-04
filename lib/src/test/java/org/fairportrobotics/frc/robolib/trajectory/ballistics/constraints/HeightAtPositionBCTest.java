@@ -78,7 +78,7 @@ public class HeightAtPositionBCTest extends BallisticConstraintTest<HeightAtPosi
             name,
             model,
             new BCEvalParams(
-                Velocity3d.zero, Units.Degrees.of(0), Velocity3d.zero, Velocity3d.zero
+                Velocity3d.kZero, Units.Degrees.of(0), Velocity3d.kZero, Velocity3d.kZero
             ),
             new HeightAtPositionBC(
                 minHeight,

@@ -15,7 +15,7 @@ public class BCEvalParamsTest {
             new BCEvalParams(
                 new Velocity3d(1.0, 1.0, 1.0),
                 Units.Degrees.of(0),
-                Velocity3d.zero,
+                Velocity3d.kZero,
                 new Velocity3d(2.0, 3.0, 4.0)
             ).getCandidateShooterVelocity(),
             "Robot Velocity Only"
@@ -24,9 +24,9 @@ public class BCEvalParamsTest {
         assertEquals(
             new Velocity3d(1.0, 0.0, 0.0),
             new BCEvalParams(
-                Velocity3d.zero,
+                Velocity3d.kZero,
                 Units.Degrees.of(90),
-                Velocity3d.zero,
+                Velocity3d.kZero,
                 new Velocity3d(0.0, 1.0, 0.0)
             ).getCandidateShooterVelocityRelative(),
             "Robot Angle Only"
@@ -37,7 +37,7 @@ public class BCEvalParamsTest {
             new BCEvalParams(
                 new Velocity3d(1.0, 1.0, 0.0),
                 Units.Degrees.of(90),
-                Velocity3d.zero,
+                Velocity3d.kZero,
                 new Velocity3d(1.0, 2.0, 0.0)
             ).getCandidateShooterVelocityRelative(),
             "Robot Velocity and Angle"

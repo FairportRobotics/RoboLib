@@ -43,7 +43,7 @@ public class SimpleBM extends BallisticModel<Integer> {
     //
 
     public Velocity3d getCandidateVelocity(Integer param) {
-        return Velocity3d.zero;
+        return Velocity3d.kZero;
     }
 
 
