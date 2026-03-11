@@ -26,6 +26,7 @@ repositories {
     gradlePluginPortal()
 
     maven {url "https://maven.ctr-electronics.com/release/"}
+    maven {url "https://maven.revrobotics.com/"}
     maven {url "https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release/"}
 }
 
@@ -47,6 +48,13 @@ dependencies {
 
     // CTRE Phoenix 6
     implementation "com.ctre.phoenix6:wpiapi-java:${ctreVersion}"
+
+    // CTRE Phoenix 5
+    implementation "com.ctre.phoenix:api-java:${ctre5Version}"
+    implementation "com.ctre.phoenix:wpiapi-java:${ctre5Version}"
+
+    // Revlib
+    implementation "com.revrobotics.frc:REVLib-java:2026.0.4"
 
     // AdvantageKit
     implementation "org.littletonrobotics.akit:akit-java:${advantageKitVersion}"
