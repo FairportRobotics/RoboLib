@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveModule {
 
-    private final int CAN_UPDATE_FREQUENCY = 50;
+    private final int CAN_UPDATE_FREQUENCY = 150;
     private final double STEER_MAX_CURRENT = 60;
     private final double DRIVE_MAX_CURRENT = 80;
 
