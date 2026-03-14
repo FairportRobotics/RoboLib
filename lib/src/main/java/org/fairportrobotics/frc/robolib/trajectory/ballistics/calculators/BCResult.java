@@ -7,6 +7,8 @@ import org.fairportrobotics.frc.robolib.trajectory.ballistics.constraints.BCEval
  */
 public record BCResult(Double penalty, BCEvalParams evalParams) {
 
+    public static final BCResult kNoSolution = new BCResult(null, null);
+
     /**
      * Checks if the result is valid (i.e. checks if penalty != null)
      * @return True if the evalParams evaluates as valid, false otherwise

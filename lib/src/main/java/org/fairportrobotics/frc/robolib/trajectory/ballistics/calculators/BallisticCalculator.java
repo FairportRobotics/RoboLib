@@ -10,24 +10,43 @@ import org.fairportrobotics.frc.robolib.trajectory.ballistics.models.BallisticMo
 
 import edu.wpi.first.units.measure.Angle;
 
+/**
+ * Base cass for ballistics calculators
+ */
 public abstract class BallisticCalculator {
+    /** The list of constraints used to evaluate solutions */
     private ArrayList<BallisticConstraint> constraints;
+    /** The weight to assign to difference in velocity while evaluating */
     private double velocityDiffWeight;
 
     //
     //  Setup code
     //
 
+    /**
+     * The default constructor. Sets velocity diff weight to 1.0
+     */
     public BallisticCalculator() {
         constraints = new ArrayList<>();
         this.velocityDiffWeight = 1.0;
     }
 
+
+    /**
+     * Add a constraint to the calculator
+     * @param constraint The constraint to add to the calculator 
+     * @return this
+     */
     public BallisticCalculator addConstraint(BallisticConstraint constraint) {
         constraints.add(constraint);
         return this;
     }
 
+    /**
+     * Set the weight for the difference in velocity
+     * @param weight The weight to assign to difference in velocity
+     * @return this
+     */
     public BallisticCalculator setVelocityDiffWeight(double weight) {
         this.velocityDiffWeight = weight;
         return this;
@@ -62,7 +81,9 @@ public abstract class BallisticCalculator {
 
 
     /**
-     * Compute the best solution for given initial conditions
+     * Compute the best solution for given initial conditions.
+     *
+     * NOTE: May reset seen candidates
      *
      * @param <M> The type of model to compute against
      * @param <P> The candidate parameter type of the model
@@ -81,6 +102,30 @@ public abstract class BallisticCalculator {
         Velocity3d  shooterVelocity
     ) throws BallisticException;
 
+    /**
+     * Generate and evaluate a solution for a given model, param, and robot state
+     *
+     * @param <M> The type of model to evaluate for
+     * @param <P> The type of param to model M
+     * @param model The model to evaluate for
+     * @param modelParam The parameter to evaluate for
+     * @param robotVelocity The robot's current velocity
+     * @param robotAngle The robot's current angle
+     * @param shooterVelocity The current velocity provided by the shooter
+     * @return The BCResult instance for the given params
+     * @throws BallisticException If thrown by registered constraints
+     */
+    protected <M extends BallisticModel<P>, P> BCResult evaluateCandidate(
+        M           model,
+        P           modelParam,
+        Velocity3d  robotVelocity,
+        Angle       robotAngle,
+        Velocity3d  shooterVelocity
+    ) throws BallisticException {
+        Velocity3d candidateVelocity    = model.getCandidateVelocity(modelParam);
+        BCEvalParams evalParams         = new BCEvalParams(robotVelocity, robotAngle, shooterVelocity, candidateVelocity);
+        return new BCResult(this.getCandidatePenalty(model, evalParams), evalParams);
+    }
 
     /**
      * Get the average penalty for a given set of params
@@ -91,8 +136,9 @@ public abstract class BallisticCalculator {
      * @param evalParams The eval function param block
      * @return The weighted average of penalties from velocity diferences and
      *  constraints (null if evalParams fail any constraints)
+     * @throws BallisicsException If thrown by registered constraints
      */
-    protected <M extends BallisticModel<P>, P> Double evaluateCandidate(
+    private <M extends BallisticModel<P>, P> Double getCandidatePenalty(
         M model, BCEvalParams evalParams
     ) throws BallisticException {
         // Get the weight component for velocity difference

@@ -4,18 +4,23 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import org.fairportrobotics.frc.robolib.trajectory.Velocity3d;
-import org.fairportrobotics.frc.robolib.trajectory.ballistics.constraints.BCEvalParams;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.exceptions.BallisticException;
 import org.fairportrobotics.frc.robolib.trajectory.ballistics.models.BallisticModel;
 
 import edu.wpi.first.units.measure.Angle;
 
+/**
+ * Simple greedy calculator (i.e. returns the first valid result)
+ */
 public class GreedyBallisticCalculator extends BallisticCalculator {
+    /**
+     * Default constructor for the calculator
+     */
     public GreedyBallisticCalculator() {
         super();
     }
 
-
+    @Override
     public <M extends BallisticModel<P>, P> BCResult computeSolution(
         M           model,
         P           initParam,
@@ -33,18 +38,16 @@ public class GreedyBallisticCalculator extends BallisticCalculator {
             P           param       = candidate_params.removeFirst();
             if(model.paramComputed(param)) continue;
 
-            Velocity3d  candidate   = model.getCandidateVelocity(param);
-            if(candidate != null) {
-                BCEvalParams    evalParams = new BCEvalParams(robotVelocity, robotAngle, shooterVelocity, candidate);
-                Double          penalty = this.evaluateCandidate(model, evalParams);
-                if(penalty != null) {
-                    return new BCResult(penalty, evalParams);
-                }
+            BCResult candidate = this.evaluateCandidate(
+                model, param, robotVelocity, robotAngle, shooterVelocity
+            );
+            if(candidate.isValid()) {
+                return candidate;
             }
 
             // Update the candidate list
             candidate_params.addAll(Arrays.asList(model.getNeighborParams(param)));
         }
-        return new BCResult(null, null);
+        return BCResult.kNoSolution;
     }
 }
