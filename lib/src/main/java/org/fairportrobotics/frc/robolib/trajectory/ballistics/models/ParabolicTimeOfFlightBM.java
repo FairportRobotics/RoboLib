@@ -13,17 +13,35 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.Time;
 
 
+/**
+ * Parabolic ballistic model, with solutions computed from time of flight
+ */
 public class ParabolicTimeOfFlightBM extends ReversableRadialBM<Time> {
+    /** The linear acceleration of gravity in the +Z axis (positive is upwards) */
     public static final LinearAcceleration k_gravity = Units.MetersPerSecondPerSecond.of(-9.81);
 
-    protected final Time tofMin;
-    protected final Time tofMax;
-    protected final Time tofStep;
+    /** The minimum time of flight to consider */
+    protected final Time    tofMin;
+    /** The maximum time of flight to consider */
+    protected final Time    tofMax;
+    /** The step between parameters */
+    protected final Time    tofStep;
 
-    protected final Angle           azimuth;
+    /** The azimuth angle between posLaunch and posTarget */
+    protected final Angle   azimuth;
 
-    private HashSet<Double>         computedSeconds;
+    /** The times (in seconds) that have been computed for */
+    private HashSet<Double> computedSeconds;
 
+    /**
+     * Main constructor
+     * 
+     * @param posLaunch The position projectiles are launched from
+     * @param posTarget The target position for projectiles
+     * @param tofMin The minimum time of flight to consider
+     * @param tofMax The maximum time of flight to consider
+     * @param tofStep The timestep between candidate times of flight
+     */
     public ParabolicTimeOfFlightBM(
         Translation3d posLaunch, Translation3d posTarget,
         Time tofMin, Time tofMax, Time tofStep
@@ -48,21 +66,39 @@ public class ParabolicTimeOfFlightBM extends ReversableRadialBM<Time> {
     //  Base getters
     //
 
+    /**
+     * Gets the minimum time of flight
+     * @return the minimum time of flight
+     */
     public Time getTOFMin() {
         return this.tofMin;
     }
 
 
+    /**
+     * Get the maximum time of flight
+     * @return The maximum time of flight
+     */
     public Time getTOFMax() {
         return this.tofMax;
     }
 
 
+    /**
+     * Get the timestep between candidate times of flight
+     *
+     * @return The timestep between candidate times of flight
+     */
     public Time getTOFStep() {
         return this.tofStep;
     }
 
 
+    /**
+     * Get the computed azimuth angle from the launch position to the target position
+     *
+     * @return the computed azimuth angle from the launch position to the target position
+     */
     public Angle getAzimuth() {
         return this.azimuth;
     }
@@ -125,7 +161,6 @@ public class ParabolicTimeOfFlightBM extends ReversableRadialBM<Time> {
     public Time getTimeAtRadius(Velocity3d candidate, Distance radialDistance) {
         return radialDistance.div(candidate.getHorizontalVelocity());
     }
-
 
     //
     //  Computed parameter check

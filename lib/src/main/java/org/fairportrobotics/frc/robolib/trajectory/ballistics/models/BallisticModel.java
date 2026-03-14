@@ -7,13 +7,27 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 
+/// Base class for ballistic models
+/// 
+/// The model is responsible for:
+///     - Tracking its launch and target positions (and relative stats)
+///     - Managing 
 public abstract class BallisticModel<P> {
-    protected Translation3d posLaunch;
-    protected Translation3d posTarget;
+    /// The launch position (i.e. where the projectile leaves the shooter)
+    protected final Translation3d posLaunch;
+    /// The target position (i.e. what we're trying to hit)
+    protected final Translation3d posTarget;
 
+    /// The position of posTarget relative to posLaunch
     protected final Translation3d targetPosRelative;
+    /// The horizontal disance of targetPosRelative
     protected final Distance relativeHorizontalDistance;
 
+    /**
+     * Constructo which sets the model
+     * @param posLaunch The inital posLaunch
+     * @param posTarget The inital posTarget
+     */
     public BallisticModel(Translation3d posLaunch, Translation3d posTarget) {
         this.posLaunch      = posLaunch;
         this.posTarget      = posTarget;
@@ -29,18 +43,36 @@ public abstract class BallisticModel<P> {
     //  Base getters
     //
 
+    /**
+     * Get the current launch position
+     * @return The current launch position
+     */
     public Translation3d getPosLaunch() {
         return this.posLaunch;
     }
 
+    /**
+     * Get the current target position
+     * @return The current target position
+     */
     public Translation3d getPosTarget() {
         return this.posTarget;
     }
 
+    /**
+     * Get the position of posTarget relative to posLaunch
+     *
+     * @return The position of posTarget relative to posLaunch
+     */
     public Translation3d getTargetPosRelative() {
         return this.targetPosRelative;
     }
 
+    /**
+     * Get the horizontal distance between posLaunch and posTarget
+     *
+     * @return The horizontal distance between posLaunch and posTarget
+     */
     public Distance getRelativeHorizontalDistance() {
         return this.relativeHorizontalDistance;
     }
@@ -50,6 +82,8 @@ public abstract class BallisticModel<P> {
     //
 
     /**
+     * Returns a recommended starting parameter
+     *
      * @return Returns a recommended starting parameter
      */
     public abstract P getInitParam();
@@ -72,7 +106,7 @@ public abstract class BallisticModel<P> {
     /**
      * Get an initial velocity (in the same coordinate space as posLaunch and
      * posTarget) which will pass thru posLaunch and posTarget with the given
-     * model configurations and parameters
+     * model configurations and parameters.
      *
      * @param param The parameters used to determine this candidate
      * @return The computed result for the given parameter
@@ -95,7 +129,8 @@ public abstract class BallisticModel<P> {
     //
 
     /**
-     * Check if a given parameter has had a computed velocity
+     * Check if a given parameter has had a computed velocity.
+     *
      * @param param The param to check
      * @return true iff the parameter has had a computed solution
      */

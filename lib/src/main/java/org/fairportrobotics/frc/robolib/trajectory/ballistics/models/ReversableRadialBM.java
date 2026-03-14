@@ -22,11 +22,14 @@ public abstract class ReversableRadialBM<P> extends BallisticModel<P> {
     //
 
     /**
-     * Get the time taken to travel a given radial distance from posLaunch towards posTarget
+     * Get the time taken to travel a given radial distance from posLaunch
+     * towards posTarget
      *
      * @param candidate The generated velocity to compute against
-     * @param radialDistance The radial distance from posLaunch to posTarget to solve for
-     * @return The time it takes to travel radialDistance from posTarget towards posTarget
+     * @param radialDistance The radial distance from posLaunch to posTarget to
+     * solve for.
+     * @return The time it takes to travel radialDistance from posTarget towards
+     * posTarget
      */
     public abstract Time getTimeAtRadius(Velocity3d candidate, Distance radialDistance);
 
