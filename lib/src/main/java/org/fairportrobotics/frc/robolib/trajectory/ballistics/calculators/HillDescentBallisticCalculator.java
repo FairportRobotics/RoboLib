@@ -45,7 +45,7 @@ public class HillDescentBallisticCalculator extends BallisticCalculator {
                 if(model.paramComputed(param)) continue;
 
                 BCResult result = this.evalSingleCandidate(model, param, robotVelocity, robotAngle, shooterVelocity);
-                if(result.penalty < bestResult.penalty) {
+                if(result.isValid() && result.penalty() < bestResult.penalty()) {
                     bestParam           = param;
                     bestResult          = result;
                     foundImprovement    = true;
