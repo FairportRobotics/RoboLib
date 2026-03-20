@@ -32,19 +32,35 @@ repositories {
 
 dependencies {
     // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    // testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // WPI Lib
-    implementation "edu.wpi.first.cscore:cscore-java:$wpiVersion"
-    implementation "edu.wpi.first.cameraserver:cameraserver-java:$wpiVersion"
-    implementation "edu.wpi.first.ntcore:ntcore-java:$wpiVersion"
-    implementation "edu.wpi.first.wpilibj:wpilibj-java:$wpiVersion"
-    implementation "edu.wpi.first.wpiutil:wpiutil-java:$wpiVersion"
-    implementation "edu.wpi.first.wpimath:wpimath-java:$wpiVersion"
-    implementation "edu.wpi.first.wpiunits:wpiunits-java:$wpiVersion"
-    implementation "edu.wpi.first.hal:hal-java:$wpiVersion"
+    // implementation "edu.wpi.first.cscore:cscore-java:$wpiVersion"
+    // implementation "edu.wpi.first.cameraserver:cameraserver-java:$wpiVersion"
+    // implementation "edu.wpi.first.ntcore:ntcore-java:$wpiVersion"
+    // implementation "edu.wpi.first.wpilibj:wpilibj-java:$wpiVersion"
+    // implementation "edu.wpi.first.wpiutil:wpiutil-java:$wpiVersion"
+    // implementation "edu.wpi.first.wpimath:wpimath-java:$wpiVersion"
+    // implementation "edu.wpi.first.wpiunits:wpiunits-java:$wpiVersion"
+    // implementation "edu.wpi.first.hal:hal-java:$wpiVersion"
+
     implementation "edu.wpi.first.wpilibNewCommands:wpilibNewCommands-java:$wpiVersion"
+
+    annotationProcessor wpi.java.deps.wpilibAnnotations()
+    implementation wpi.java.deps.wpilib()
+    implementation wpi.java.vendor.java()
+
+    nativeDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.desktop)
+    nativeDebug wpi.java.vendor.jniDebug(wpi.platforms.desktop)
+    simulationDebug wpi.sim.enableDebug()
+
+    nativeRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.desktop)
+    nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
+    simulationRelease wpi.sim.enableRelease()
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // CTRE Phoenix 6
     implementation "com.ctre.phoenix6:wpiapi-java:${ctreVersion}"
@@ -58,7 +74,6 @@ dependencies {
 
     // AdvantageKit
     implementation "org.littletonrobotics.akit:akit-java:${advantageKitVersion}"
-
 }
 
 tasks.named('test') {
