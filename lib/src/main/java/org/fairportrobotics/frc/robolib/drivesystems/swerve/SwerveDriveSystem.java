@@ -7,6 +7,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -95,7 +96,7 @@ public class SwerveDriveSystem implements Subsystem{
         double deltaTimeSecond = (mLastSimTime - Utils.getCurrentTimeSeconds());
 
         if(mLastSimTime != 0){
-            Pose3d oldPose = getRobotPose();
+            Pose3d oldPose = getRobotPose3d();
             poseEstimator.resetPose(new Pose3d(oldPose.getX() + (chassisSpeeds.vxMetersPerSecond * (deltaTimeSecond)), oldPose.getY() + chassisSpeeds.vyMetersPerSecond * (deltaTimeSecond), 0, oldPose.getRotation().plus(new Rotation3d(Rotation2d.fromRadians(chassisSpeeds.omegaRadiansPerSecond * (deltaTimeSecond))))));
         }
 
@@ -159,7 +160,7 @@ public class SwerveDriveSystem implements Subsystem{
      * @param chassisSpeeds
      * @param centerOfRotation
      */
-    private void setChassisSpeed(ChassisSpeeds chassisSpeeds, Translation2d centerOfRotation){
+    public void setChassisSpeed(ChassisSpeeds chassisSpeeds, Translation2d centerOfRotation){
         this.chassisSpeeds = chassisSpeeds;
         this.centerOfRotation = centerOfRotation;
     }
@@ -194,12 +195,40 @@ public class SwerveDriveSystem implements Subsystem{
         ), new Translation2d());
     }
 
+    public ChassisSpeeds getRobotRelativeSpeeds(){
+        return this.chassisSpeeds;
+    }
+
     /**
      * Get the current field location of the robot
      * @return The current pose as a Pose3d
      */
-    public Pose3d getRobotPose(){
+    public Pose3d getRobotPose3d(){
         return poseEstimator.getEstimatedPosition();
+    }
+
+    /**
+     * Get the current field location of the robot
+     * @return The current pose as a Pose2d
+     */
+    public Pose2d getRobotPose2d(){
+        return poseEstimator.getEstimatedPosition().toPose2d();
+    }
+
+    /**
+     * Set pose estimation to a specific pose
+     * @param pose The new pose as a Pose3d
+     */
+    public void setPose3d(Pose3d pose){
+        poseEstimator.resetPose(pose);
+    }
+
+    /**
+     * Set pose estimation to a specific pose
+     * @param pose The new pose as a Pose2d
+     */
+    public void setPose2d(Pose2d pose){
+        this.setPose3d(new Pose3d(pose));
     }
 
     private SwerveModulePosition[] getModulePositions(){
