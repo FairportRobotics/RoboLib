@@ -15,6 +15,8 @@ public class Limelight {
     this.name = name;
     this.poseEstimator = poseEstimator;
     this.pose=pose;
+
+    LimelightHelpers.setCameraPose_RobotSpace(name, pose.getX(), pose.getY(), pose.getZ(), Math.toDegrees(pose.getRotation().getX()), Math.toDegrees(pose.getRotation().getY()), Math.toDegrees(pose.getRotation().getZ()));
   } 
 
   public LimelightHelpers.PoseEstimate updateOdometry() {      
