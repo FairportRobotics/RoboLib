@@ -6,6 +6,7 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -221,6 +222,14 @@ public class SwerveDriveSystem implements Subsystem{
      */
     public void setPose3d(Pose3d pose){
         poseEstimator.resetPose(pose);
+    }
+
+    /**
+     * Get the pose estimator instance
+     * @return pose estimator instance
+     */
+    public SwerveDrivePoseEstimator3d getPoseEstimator(){
+        return poseEstimator;
     }
 
     /**
