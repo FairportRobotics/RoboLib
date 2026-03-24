@@ -84,7 +84,8 @@ public class SwerveDriveSystem implements Subsystem{
             moduleStates[i].optimize(modules[i].getSteerRotations());
         }
 
-        poseEstimator.updateWithTime(Utils.getCurrentTimeSeconds(), new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
+        poseEstimator.update(new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
+        // poseEstimator.updateWithTime(Utils.getCurrentTimeSeconds(), new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
 
         for(int i=0;i<modules.length;i++){
             modules[i].setRequestedModuleState(moduleStates[i]);
