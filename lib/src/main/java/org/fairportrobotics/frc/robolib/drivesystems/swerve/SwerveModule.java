@@ -172,7 +172,7 @@ public class SwerveModule {
     }
 
     private double getModuleDistance(){
-        double distance = (this.driveMotor.getPosition(true).getValueAsDouble() * gearRatio) * (Math.PI * wheelDiameterInMeters);
+        double distance = (this.driveMotor.getPosition(true).getValueAsDouble() / gearRatio) * (Math.PI * wheelDiameterInMeters);
         return distance;
     }
 

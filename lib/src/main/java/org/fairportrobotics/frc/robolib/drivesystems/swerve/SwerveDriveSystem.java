@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
@@ -72,7 +73,7 @@ public class SwerveDriveSystem implements Subsystem{
 
         gyro = new Pigeon2(pigeonId, canBus);
 
-        poseEstimator = new SwerveDrivePoseEstimator3d(driveKiniematics, new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions(), Pose3d.kZero);
+        poseEstimator = new SwerveDrivePoseEstimator3d(driveKiniematics, new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().in(Units.Revolution))), getModulePositions(), Pose3d.kZero);
         chassisSpeeds = new ChassisSpeeds();
     }
 
@@ -84,7 +85,7 @@ public class SwerveDriveSystem implements Subsystem{
             moduleStates[i].optimize(modules[i].getSteerRotations());
         }
 
-        poseEstimator.update(new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
+        poseEstimator.update(new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().in(Units.Rotations))), getModulePositions());
         // poseEstimator.updateWithTime(Utils.getCurrentTimeSeconds(), new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
 
         for(int i=0;i<modules.length;i++){
@@ -178,7 +179,7 @@ public class SwerveDriveSystem implements Subsystem{
             MAX_LINEAR_SPEED * x,
             MAX_LINEAR_SPEED * y,
             MAX_ANGULAR_SPEED * rot,
-            Rotation2d.fromDegrees(getCurrentYaw().magnitude())
+            Rotation2d.fromDegrees(getCurrentYaw().in(Units.Degrees))
         ), new Translation2d());
     }
 
@@ -193,7 +194,7 @@ public class SwerveDriveSystem implements Subsystem{
             MAX_LINEAR_SPEED * x,
             MAX_LINEAR_SPEED * y,
             MAX_ANGULAR_SPEED * rot,
-            Rotation2d.fromDegrees(getCurrentYaw().magnitude())
+            Rotation2d.fromDegrees(getCurrentYaw().in(Units.Degrees))
         ), new Translation2d());
     }
 
