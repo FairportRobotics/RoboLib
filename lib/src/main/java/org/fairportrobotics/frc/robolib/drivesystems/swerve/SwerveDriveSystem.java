@@ -6,7 +6,6 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
-import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -17,8 +16,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class SwerveDriveSystem implements Subsystem{
@@ -73,7 +70,7 @@ public class SwerveDriveSystem implements Subsystem{
 
         gyro = new Pigeon2(pigeonId, canBus);
 
-        poseEstimator = new SwerveDrivePoseEstimator3d(driveKiniematics, new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().in(Units.Revolution))), getModulePositions(), Pose3d.kZero);
+        poseEstimator = new SwerveDrivePoseEstimator3d(driveKiniematics, new Rotation3d(getRobotHeading()), getModulePositions(), Pose3d.kZero);
         chassisSpeeds = new ChassisSpeeds();
     }
 
@@ -85,7 +82,7 @@ public class SwerveDriveSystem implements Subsystem{
             moduleStates[i].optimize(modules[i].getSteerRotations());
         }
 
-        poseEstimator.update(new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().in(Units.Rotations))), getModulePositions());
+        poseEstimator.update(new Rotation3d(getRobotHeading()), getModulePositions());
         // poseEstimator.updateWithTime(Utils.getCurrentTimeSeconds(), new Rotation3d(Rotation2d.fromRotations(getCurrentYaw().magnitude())), getModulePositions());
 
         for(int i=0;i<modules.length;i++){
@@ -143,11 +140,11 @@ public class SwerveDriveSystem implements Subsystem{
     }
 
     /**
-     * Get the current yaw angle from the Gyro
-     * @return The current yaw as an Angle
+     * Get the robots current heading
+     * @return The current heading of the robot
      */
-    private Angle getCurrentYaw(){
-        return gyro.getYaw().getValue();
+    public Rotation2d getRobotHeading(){
+        return gyro.getRotation2d();
     }
 
     /**
@@ -179,7 +176,7 @@ public class SwerveDriveSystem implements Subsystem{
             MAX_LINEAR_SPEED * x,
             MAX_LINEAR_SPEED * y,
             MAX_ANGULAR_SPEED * rot,
-            Rotation2d.fromDegrees(getCurrentYaw().in(Units.Degrees))
+            getRobotHeading()
         ), new Translation2d());
     }
 
@@ -194,7 +191,7 @@ public class SwerveDriveSystem implements Subsystem{
             MAX_LINEAR_SPEED * x,
             MAX_LINEAR_SPEED * y,
             MAX_ANGULAR_SPEED * rot,
-            Rotation2d.fromDegrees(getCurrentYaw().in(Units.Degrees))
+            getRobotHeading()
         ), new Translation2d());
     }
 
