@@ -18,6 +18,8 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import com.ctre.phoenix6.sim.CANcoderSimState;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -38,11 +40,14 @@ public class SwerveModule {
 
     private TalonFX driveMotor;
     private VelocityVoltage driveRequest = new VelocityVoltage(0);
+    private TalonFXSimState driveSim;
 
     private TalonFX steerMotor;
     private PositionVoltage steerPosRequest = new PositionVoltage(0);
+    private TalonFXSimState steerSim;
 
     private CANcoder steerEncoder;
+    private CANcoderSimState steerEncoderSim;
 
     private String moduleName;
 
@@ -75,16 +80,19 @@ public class SwerveModule {
         steerEncoder.getAbsolutePosition().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
         steerEncoder.optimizeBusUtilization();
         steerEncoder.getConfigurator().apply(generateCanCoderConfiguration(steerOffset));
+        steerEncoderSim = steerEncoder.getSimState();
 
         driveMotor = new TalonFX(driveMotorId, canBusObj);
         driveMotor.getVelocity().setUpdateFrequency(CAN_UPDATE_FREQUENCY);
         driveMotor.optimizeBusUtilization();
         driveMotor.getConfigurator().apply(generateDriveTalonConfiguration(driveKP, driveKI, driveKD, driveKV, driveInverted));
+        driveSim = driveMotor.getSimState();
 
         steerMotor = new TalonFX(steerMotorId, canBusObj);
         steerMotor.optimizeBusUtilization();
         steerMotor.getConfigurator().apply(generateSteerTalonConfiguration(steerKP, steerKI, steerKD, steerKS, steerKV, steerKA));
         // steerMotor.setNeutralMode(NeutralModeValue.Brake);
+        steerSim = steerMotor.getSimState();
 
         this.moduleLocation = moduleLocation;
 
@@ -165,6 +173,10 @@ public class SwerveModule {
         SmartDashboard.putNumber(moduleName + " steer setpoint", steerMotor.getClosedLoopReference().getValueAsDouble());
 
         SmartDashboard.putNumber(moduleName + " steerPos", getSteerRotations().getRotations());
+    }
+
+    public void simulationPeriodic(){
+        // driveSim.se
     }
 
     public String getModuleName(){

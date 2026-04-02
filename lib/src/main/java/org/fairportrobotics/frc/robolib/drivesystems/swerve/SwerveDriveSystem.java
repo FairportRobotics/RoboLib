@@ -2,6 +2,8 @@ package org.fairportrobotics.frc.robolib.drivesystems.swerve;
 
 import java.util.Arrays;
 
+import org.littletonrobotics.junction.ConsoleSource.RoboRIO;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -16,6 +18,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class SwerveDriveSystem implements Subsystem{
@@ -196,7 +201,10 @@ public class SwerveDriveSystem implements Subsystem{
     }
 
     public ChassisSpeeds getRobotRelativeSpeeds(){
-        return this.chassisSpeeds;
+        if(!RobotBase.isReal()){
+            return driveKiniematics.toChassisSpeeds(getRequestedModuleStates());
+        }
+        return driveKiniematics.toChassisSpeeds(getActualModuleStates());
     }
 
     /**
