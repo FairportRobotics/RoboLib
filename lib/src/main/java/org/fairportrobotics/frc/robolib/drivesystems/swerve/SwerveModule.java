@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -31,7 +32,7 @@ public class SwerveModule {
 
     private final int CAN_UPDATE_FREQUENCY = 150;
     private final double STEER_MAX_CURRENT = 60;
-    private final double DRIVE_MAX_CURRENT = 80;
+    private final double DRIVE_MAX_CURRENT = 40;
 
     private final double gearRatio;
     private final double wheelDiameterInMeters;
@@ -40,6 +41,7 @@ public class SwerveModule {
 
     private TalonFX driveMotor;
     private VelocityVoltage driveRequest = new VelocityVoltage(0);
+    // private MotionMagicVelocityVoltage driveRequest = new MotionMagicVelocityVoltage(0);
     private TalonFXSimState driveSim;
 
     private TalonFX steerMotor;
@@ -195,7 +197,14 @@ public class SwerveModule {
                 .withKI(kI)
                 .withKD(kD)
                 .withKV(kV)
+                .withKS(0)
+                .withKA(0)
             )
+        .withMotionMagic(
+            new MotionMagicConfigs()
+                .withMotionMagicAcceleration(400)
+                .withMotionMagicJerk(4000)
+        )
         .withMotorOutput(
             new MotorOutputConfigs()
                 .withInverted(driveInverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive)
