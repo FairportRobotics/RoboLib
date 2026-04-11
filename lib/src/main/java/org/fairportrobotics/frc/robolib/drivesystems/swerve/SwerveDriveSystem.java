@@ -2,11 +2,16 @@ package org.fairportrobotics.frc.robolib.drivesystems.swerve;
 
 import java.util.Arrays;
 
+<<<<<<< Updated upstream
 import org.littletonrobotics.junction.ConsoleSource.RoboRIO;
 
+=======
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+>>>>>>> Stashed changes
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator3d;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -245,6 +250,17 @@ public class SwerveDriveSystem implements Subsystem{
      */
     public void setPose2d(Pose2d pose){
         this.setPose3d(new Pose3d(pose));
+    }
+
+    /**
+     * Set module brake mode
+     * @param brakeMode true for brake, false for coast
+     */
+    public void setBrakeMode(boolean brakeMode){
+        SwerveModule[] modules = getModules();
+        for(SwerveModule mod : modules){
+            mod.getDriveMotor().setNeutralMode(brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        }
     }
 
     private SwerveModulePosition[] getModulePositions(){
