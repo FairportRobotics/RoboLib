@@ -2,12 +2,9 @@ package org.fairportrobotics.frc.robolib.drivesystems.swerve;
 
 import java.util.Arrays;
 
-<<<<<<< Updated upstream
 import org.littletonrobotics.junction.ConsoleSource.RoboRIO;
 
-=======
 import com.ctre.phoenix.motorcontrol.NeutralMode;
->>>>>>> Stashed changes
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
